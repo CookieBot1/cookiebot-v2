@@ -38,6 +38,8 @@ async def generate(ctx, userID = '0', amount = "0"):
                 raise Exception("You can't generate more/less than 300 cookies at a time.")
             else:
                 userCookies += amount
+        else:
+            userCookies += amount
 
         ## send the embed
         give_embed = discord.Embed(
