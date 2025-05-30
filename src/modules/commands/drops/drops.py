@@ -108,7 +108,7 @@ class ChannelProcessor:
         author_id = message.author.id
 
         prompt_embed = discord.Embed(
-            title="🎉 WE HAVE A WINNER!!",
+            title="🎉 Cookies Collected!",
             color=0x2ECC71,
             description=(
                 f"Good job <@{author_id}> for being the fastest! Your pockets are now filled with "
