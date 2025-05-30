@@ -24,6 +24,9 @@ async def stats(ctx, userID = '0'):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
+        userStreaks = userData["users"][userID]["Streaks"]
+        userCookies = userData["users"][userID]["Cookies"]
+        userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
 
         ## send the embed
         stats_embed = discord.Embed(
@@ -31,14 +34,14 @@ async def stats(ctx, userID = '0'):
             color = 0x7289da,
             )
     
-        stats_embed.add_field(name = "Cookies", value = userData["users"][userID]["Cookies"], inline = True)
-        if userData["users"][userID]["Streaks"] == 1:
+        stats_embed.add_field(name = "Cookies", value = userCookies, inline = True)
+        if userStreaks == 1:
             dayTerm = "Day"
         else:
             dayTerm = "Days"
-        stats_embed.add_field(name = "Streaks", value = str(userData["users"][userID]["Streaks"]) + " " + dayTerm, inline = True)
-        if userData["users"][userID]["DailyMultiplier"] != 0:
-            stats_embed.add_field(name = "Daily Multiplier", value = str(userData["users"][userID]["DailyMultiplier"]) + " Cookie Multiplier Active!", inline = False)
+        stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
+        if userDailyMultiplier != 0:
+            stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
         stats_embed.add_field(name = "Inventory", value = "WIP", inline = False)
 
         stats_embed.set_thumbnail(url = user.display_avatar)

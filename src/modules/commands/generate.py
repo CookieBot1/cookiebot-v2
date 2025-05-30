@@ -28,15 +28,15 @@ async def generate(ctx, userID = '0', amount = "0"):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        
-        cookies = userData["users"][userID]["Cookies"] 
-        if cookies + amount < 0:
+        userCookies = userData["users"][userID]["Cookies"] 
+
+        if userCookies + amount < 0:
             raise Exception("You can't put the user in a negative balance!")
         if await is_admin(ctx.author.id) == False:
             if amount > 300 or amount < -300:
                 raise Exception("You can't generate more/less than 300 cookies at a time.")
         else:
-            cookies += amount
+            userCookies += amount
 
         ## send the embed
         give_embed = discord.Embed(
@@ -49,11 +49,11 @@ async def generate(ctx, userID = '0', amount = "0"):
         if amount < 0:
             give_embed.add_field(name = "", value = "Removed **" + str(amount) + " cookies** from " + user.display_name + "'s balance!", inline = False)
 
-        give_embed.set_footer(text = user.display_name + " now has " + str(cookies) + " cookies.")
+        give_embed.set_footer(text = user.display_name + " now has " + str(userCookies) + " cookies.")
         await ctx.send(embed=give_embed)
 
         ## update the database
-        await update_value(userID, guildID, "Cookies", cookies)
+        await update_value(userID, guildID, "Cookies", userCookies)
 
     except ValueError:
         await ctx.send("Invalid amount, try again!")

@@ -17,15 +17,20 @@ async def daily(ctx):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
+        userCookies = userData["users"][userID]["Cookies"]
+        userStreaks = userData["users"][userID]["Streaks"]
+        userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
+        userMultExpire = userData["users"][userID]["DailyMultExpire"]
+        userDailyExpire = userData["users"][userID]["DailyExpire"]
 
         ## this checks if they have a cooldown
-        if datetime.now() < userData["users"][userID]["DailyExpire"]:
-            timer = int(userData["users"][userID]["DailyExpire"].timestamp())
+        if datetime.now() < userDailyExpire:
+            timer = int(userDailyExpire.timestamp())
 
             cooldown_embed = discord.Embed(
                 description = "You can collect your cookies again " + "<t:" + str(timer) + ":R>",
                 color = 0x992d22,
-                timestamp = userData["users"][userID]["DailyExpire"]
+                timestamp = userDailyExpire
                 )
             cooldown_embed.set_author(name = "Not yet " + str(user.display_name) + "!", icon_url = user.display_avatar)
             await ctx.send(embed=cooldown_embed)
@@ -34,29 +39,29 @@ async def daily(ctx):
         ## calculate and give daily cookies
         BaseCookies = 15
         Multiplier = 0
-        StreakCookies = int((userData["users"][userID]["Streaks"]/14) * 1.5)
-        if userData["users"][userID]["DailyMultiplier"] > 0:
-            if userData["users"][userID]["DailyMultExpire"] >= datetime.now(): Multiplier = userData["users"][userID]["DailyMultiplier"]
-            else: userData["users"][userID]["DailyMultiplier"] = 0
+        StreakCookies = int((userStreaks/14) * 1.5)
+        if userDailyMultiplier > 0:
+            if userMultExpire >= datetime.now(): Multiplier = userDailyMultiplier
+            else: userDailyMultiplier = 0
         
         Temp = (BaseCookies + StreakCookies) * Multiplier
         TotalCookies = BaseCookies + StreakCookies + Temp
-        userData["users"][userID]["Cookies"] += TotalCookies
+        userCookies += TotalCookies
 
         ## this block updates their streak and daily cooldown
-        if datetime.now() > userData["users"][userID]["DailyExpire"] + timedelta(hours = 24): ## reset cooldown if 24 hours past expiration
-            userData["users"][userID]["Streaks"] = 1
+        if datetime.now() > userDailyExpire + timedelta(hours = 24): ## reset cooldown if 24 hours past expiration
+            userStreaks = 1
         else:
-            userData["users"][userID]["Streaks"] += 1
+            userStreaks += 1
         
-        userData["users"][userID]["DailyExpire"] = datetime.now() + timedelta(hours = 23)
+        userDailyExpire = datetime.now() + timedelta(hours = 23)
 
         ## send the final embed
         dailyembed = discord.Embed(
             description = "You have collected your daily ``" + str(TotalCookies) + "`` cookies!" + "\n" + 
-            "You now have a streak of ``" + str(userData["users"][userID]["Streaks"]) + "``.", 
+            "You now have a streak of ``" + str(userStreaks) + "``.", 
             color = 0x2ecc71,
-            timestamp = userData["users"][userID]["DailyExpire"]
+            timestamp = userDailyExpire
             )
 
         dailyembed.set_author(name = "Daily Cookies - " + str(user.display_name), icon_url = user.display_avatar)
@@ -64,6 +69,12 @@ async def daily(ctx):
         await ctx.send(embed=dailyembed)
 
         ## update the database
+        userData["users"][userID]["Cookies"] = userCookies
+        userData["users"][userID]["Streaks"] = userStreaks
+        userData["users"][userID]["DailyMultiplier"] = userDailyMultiplier
+        userData["users"][userID]["DailyMultExpire"] = userMultExpire
+        userData["users"][userID]["DailyExpire"] = userDailyExpire
+        
         await update_database(userID, guildID, userData["users"][userID])
         
     except Exception as Error:

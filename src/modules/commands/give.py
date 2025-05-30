@@ -19,22 +19,26 @@ async def give(ctx, userID = '0', amount = "0"):
         senderID = str(ctx.author.id)
         sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
 
-        ## this block fetches both user's data from the database
+        ## fetching userData
         userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
+        userCookies = userData["users"][senderID]["Cookies"]
+
+        ## fetching senderData
         senderData = await lookup_database(senderID, guildID) 
         if senderData == False:
             await new_database(senderID, guildID)
             senderData = await lookup_database(senderID, guildID)
+        senderCookies = senderData["users"][senderID]["Cookies"]
 
         ## check if sender has enough cookies
-        if userData["users"][senderID]["Cookies"] < amount: raise Exception("Ahem- you don't have that many cookies..")
+        if userCookies < amount: raise Exception("Ahem- you don't have that many cookies..")
         
         ## transfer the cookies
-        userData["users"][userID]["Cookies"] += amount
-        senderData["users"][senderID]["Cookies"] -= amount
+        userCookies += amount
+        senderCookies -= amount
 
         ## send the embed
         give_embed = discord.Embed(
@@ -42,14 +46,14 @@ async def give(ctx, userID = '0', amount = "0"):
             color = 0x2ecc71,
             )
 
-        give_embed.add_field(name = "", value = "🍪 " + user.display_name + " now has **" + str(userData["users"][userID]["Cookies"]) + " cookies!**", inline = False)
+        give_embed.add_field(name = "", value = "🍪 " + user.display_name + " now has **" + str(userCookies) + " cookies!**", inline = False)
         give_embed.set_author(name = "", icon_url = sender.display_avatar)
         give_embed.set_footer(text = "Cookies delivered by Sam")
         await ctx.send(embed=give_embed)
 
         ## update the database
-        await update_value(userID, guildID, "Cookies", userData["users"][userID]["Cookies"])
-        await update_value(senderID, guildID, "Cookies", senderData["users"][senderID]["Cookies"])
+        await update_value(userID, guildID, "Cookies", userCookies)
+        await update_value(senderID, guildID, "Cookies", senderCookies)
 
     except Exception as Error:
         await ctx.send(Error)

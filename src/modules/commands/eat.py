@@ -14,13 +14,13 @@ async def eat(ctx):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        
-        cookies = userData["users"][userID]["Cookies"] 
-        if cookies < 1:
+        userCookies = userData["users"][userID]["Cookies"]
+
+        if userCookies < 1:
             raise Exception("You have no cookies to eat!")
         else:
-            cookies -= 1
-            await update_value(userID, guildID, "Cookies", cookies)
+            userCookies -= 1
+            await update_value(userID, guildID, "Cookies", userCookies)
             await ctx.send("Nom nom, you ate 1 cookie 🍪")
 
     except Exception as Error:
