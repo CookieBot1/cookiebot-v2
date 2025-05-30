@@ -30,13 +30,14 @@ async def generate(ctx, userID = '0', amount = "0"):
             userData = await lookup_database(userID, guildID)
         userCookies = userData["users"][userID]["Cookies"] 
 
-        if userCookies + amount < 0:
-            raise Exception("You can't put the user in a negative balance!")
+        ## bot admins bypass the checks
         if await is_admin(ctx.author.id) == False:
+            if userCookies + amount < 0:
+                raise Exception("You can't put the user in a negative balance!")
             if amount > 300 or amount < -300:
                 raise Exception("You can't generate more/less than 300 cookies at a time.")
-        else:
-            userCookies += amount
+            else:
+                userCookies += amount
 
         ## send the embed
         give_embed = discord.Embed(
