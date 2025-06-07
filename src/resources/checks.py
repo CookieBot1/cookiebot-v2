@@ -45,7 +45,7 @@ async def new_database(userID, guildID):
         "DailyExpire": datetime.now() - timedelta(hours=24),
         "RobExpire": datetime.now() - timedelta(hours=24),
         "DailyMultiplier": 0,
-        "RobChances": 7,
+        "RobChances": 7, ## default rob chance, 70% failure
         "DailyMultExpire": datetime.now(),
         "RobExpire": datetime.now(),
         "Inventory": "Empty",
