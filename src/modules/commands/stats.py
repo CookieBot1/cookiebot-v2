@@ -1,18 +1,18 @@
 from resources.mrcookie import instance as bot
 import discord
 
-from resources.checks import lookup_database, new_database
+from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
 
 @bot.command(aliases = ["bal", "balance"])
 async def stats(ctx, userID = '0'):
     try:
         ## if another user was mentioned, check if they're legit, else use sender ID
-        if userID == '0':
-            userID = str(ctx.author.id)
+        if userID != '0':
+            userID = await validate_user(userID, guild)
+            if userID == None or guild.get_member(int(userID)) is None: raise Exception("Invalid user, try again!")
+            if await is_blacklisted(userID): raise Exception("Can't show stats, user is blacklisted.")
         else:
-            userID = userID.strip("<@!>")
-            if userID.isdigit() == False or len(userID) < 17 or ctx.guild.get_member(int(userID)) is None:
-                raise Exception("Invalid user or not in the guild.")
+            userID = ctx.author.id
         
         ## set vars
         guildID = ctx.guild.id
