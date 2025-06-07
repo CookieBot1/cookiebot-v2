@@ -49,7 +49,7 @@ async def new_database(userID, guildID):
         "DailyMultExpire": datetime.now(),
         "RobExpire": datetime.now(),
         "Inventory": "Empty",
-        "RobProtection": 0,
+        "RobProtection": datetime.now() - timedelta(hours=24),
     }
     await bot.db.update_user({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
