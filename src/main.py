@@ -1,11 +1,14 @@
-import discord
 import asyncio
-from discord.ext import commands
-from resources.mrcookie import MrCookie
 
 # env stuff
 import os
+
+import discord
+from discord.ext import commands
 from dotenv import load_dotenv
+
+from resources.mrcookie import MrCookie
+
 load_dotenv()
 
 # for bot uptime tracking
@@ -28,7 +31,7 @@ async def main():
         intents=intents,
     )
 
-    MODULES = ["modules/commands", "modules/events", "modules/commands/drops"]
+    MODULES = ["modules/commands", "modules/events", "modules/commands/drops", "modules/commands/counter"]
 
     ## loop through all the files under the commands folder, that's how we check for commands
     for directory in MODULES:
