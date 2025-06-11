@@ -8,9 +8,10 @@ from resources.checks import lookup_database, new_database, update_value, is_bla
 @commands.cooldown(1, 30)
 async def generate(ctx, userID = '0', amount = "0"):
     try:
-        if ctx.author.guild_permissions.manage_guild == False: 
-            if await is_admin(ctx.author.id) == False: 
-                raise Exception("You don't have permission to use this command.")
+        ## this will only be for premium or whitelisted servers, for now it's locked to bot admins
+        ##if ctx.author.guild_permissions.manage_guild == False: 
+        if await is_admin(ctx.author.id) == False: 
+            raise Exception("You don't have permission to use this command.")
 
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
