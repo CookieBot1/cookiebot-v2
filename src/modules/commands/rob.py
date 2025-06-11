@@ -1,12 +1,12 @@
 from resources.mrcookie import instance as bot
-from robbing.messages import success_list
 import discord
 from datetime import datetime
 import random
 
+from modules.commands.robbing.messages import success_list
 from resources.checks import lookup_database, new_database, update_database, is_blacklisted, validate_user
 
-@bot.command(aliases = ["mug", "steal"])
+@bot.command(aliases = ["steal"])
 async def rob(ctx, userID = '0'):
     try:
         guildID = ctx.guild.id
@@ -31,7 +31,7 @@ async def rob(ctx, userID = '0'):
             userID = await validate_user(userID, guild)
             if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id: raise Exception("Invalid user, try again!")
             if await is_blacklisted(userID): raise Exception("Unable to rob, that user is blacklisted.")
-        else: raise Exception("Random User Selection WIP")
+        else: raise Exception("Random User Selection WIP") ## !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         ## pinged/random user checks
         userData = await lookup_database(userID, guildID) 
@@ -46,8 +46,8 @@ async def rob(ctx, userID = '0'):
         if userCookies < 15: raise Exception("Woah there! User needs at least 15 cookies to be robbed.")
         if userRobProt > datetime.now(): raise Exception("User has an active rob shield, try again later!")
 
-        ## robbing calculation
-        randomNum = random.choice(range(0,11)) 
+        randomNum = random.choice(range(0,11))
+        ## successful rob calculation
         if randomNum > userRobChances: 
             successMessage = success_list[random.choice(range(0, len(success_list)))] 
 
