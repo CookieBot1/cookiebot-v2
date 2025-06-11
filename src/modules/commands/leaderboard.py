@@ -27,7 +27,7 @@ class SimpleUser:
 
 
 @bot.command(aliases=["lb"])
-@commands.cooldown(1, 45)
+@commands.cooldown(1, 45, commands.BucketType.guild)
 async def leaderboard(ctx: commands.Context):
     if ctx.guild is None:
         return await ctx.reply("This command can only be run in a server!", delete_after=7)
