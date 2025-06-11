@@ -43,13 +43,13 @@ async def new_database(userID, guildID):
         "Cookies": 0,
         "Streaks": 0,
         "DailyExpire": datetime.now() - timedelta(hours=24),
-        "RobExpire": datetime.now() - timedelta(hours=24),
         "DailyMultiplier": 0,
-        "RobChances": 7, ## default rob chance, 70% failure
         "DailyMultExpire": datetime.now(),
+        "RobExpire": datetime.now() - timedelta(hours=24),
+        "RobChances": 7, ## default rob chance, 70% failure
         "RobExpire": datetime.now(),
-        "Inventory": "Empty",
         "RobProtection": datetime.now() - timedelta(hours=24),
+        "Inventory": "Empty",
     }
     await bot.db.update_user({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
@@ -74,7 +74,11 @@ async def lookup_counter(guildID):
 
 
 async def new_counter(guildID):
-    newGuild = {"Channel": 0, "Counter": 0, "lastUser": 0}
+    newGuild = {
+        "Channel": 0, 
+        "Counter": 0, 
+        "lastUser": 0,
+    }
     await bot.db.update_user({"_id": str(guildID)}, {"$set": {"settings." + "counter": {**newGuild}}})
 
 
