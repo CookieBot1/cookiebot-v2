@@ -1,3 +1,6 @@
+##async def successList():
+    
+
 # list of default rob success messages
 success_list = [
 "stealing their toilet and selling it on ebay, what's wrong with you??",
