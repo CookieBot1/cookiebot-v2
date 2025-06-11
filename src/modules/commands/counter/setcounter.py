@@ -10,8 +10,8 @@ async def setcounter(ctx):
     await update_counter(guildID, "lastUser", 0)
 
     counter_embed = discord.Embed(
-        title = "Counter Channel Set!",
-        description = "Want to change your counter channel? Run this command again in that channel.",
+        title = "✅ Counter Channel Set!",
+        description = "Want to change your counter channel? Run ``.setcounter`` again in that channel.",
         color = 0x2ecc71,
         )
 
