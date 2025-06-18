@@ -1,10 +1,17 @@
 from resources.mrcookie import instance as bot
-from resources.checks import update_counter
+from resources.checks import update_counter, lookup_counter, new_counter
 import discord
 
 @bot.command()
 async def setcounter(ctx):
     guildID = ctx.guild.id
+
+    counterData = await lookup_counter(guildID)
+    if counterData is False:
+        await new_counter(guildID)
+        counterData = await lookup_counter(guildID)
+
+    # resets data to default incase they run .setcounter after already having an existing counting channel
     await update_counter(guildID, "Channel", ctx.channel.id)
     await update_counter(guildID, "Counter", 0)
     await update_counter(guildID, "lastUser", 0)
