@@ -1,6 +1,6 @@
 import discord
 
-from resources.checks import lookup_counter, update_counter
+from resources.checks import lookup_counter, update_counter, update_value, lookup_database, new_database
 from resources.mrcookie import instance as bot
 
 
@@ -20,21 +20,31 @@ async def on_message(message: discord.Message):
     if not channel:
         return  # Channel could not be found.
 
-    savedCounter = counterData["settings"]["counter"]["Counter"]  # last accepted number
-    lastUser = counterData["settings"]["counter"]["lastUser"]  # user who sent last message
     guild = bot.get_guild(message.guild.id)
-    user = guild.get_member(int(message.author.id)) or await guild.fetch_member(int(message.author.id))
-    guild_id = message.guild.id
+    userID = str(message.author.id)
+    user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+    guildID = message.guild.id
     try:
         if message.channel.id != channelID or not message.content.isdigit():
             return
 
+        ## setting vars
+        savedCounter = counterData["settings"]["counter"]["Counter"]  # last accepted number
+        lastUser = counterData["settings"]["counter"]["lastUser"]  # user who sent last message
+        userData = await lookup_database(userID, guildID) 
+        if userData == False:
+            await new_database(userID, guildID)
+            userData = await lookup_database(userID, guildID)
+        userCounter = userData["users"][userID]["Counter"]
+        userFailCounter = userData["users"][userID]["FailCounter"]
+
         if int(message.content) == savedCounter + 1:
-            if message.author.id != lastUser:
+            if userID != lastUser:
                 savedCounter = int(message.content)
-                lastUser = message.author.id
-                await update_counter(guild_id, "Counter", savedCounter)
-                await update_counter(guild_id, "lastUser", lastUser)
+                userCounter += 1
+                await update_counter(guildID, "Counter", savedCounter)
+                await update_counter(guildID, "lastUser", userID)
+                await update_value(userID, guildID, "Counter", userCounter)
                 await message.add_reaction("✅")
             else:
                 raise ValueError(user.mention + " FAILED AT **" + str(savedCounter) + "**!! You can't count two times in a row.")
@@ -42,6 +52,8 @@ async def on_message(message: discord.Message):
             raise ValueError(user.mention + " FAILED AT **" + str(savedCounter) + "**!! You said the wrong number.")
     
     except ValueError as Error:
+        userFailCounter += 1
+        await update_value(userID, guildID, "FailCounter", userFailCounter)
         await channel.send(str(Error))
 
         failedCount_embed = discord.Embed(
@@ -53,6 +65,6 @@ async def on_message(message: discord.Message):
         failedCount_embed.set_footer(text = 'Want to see a leaderboard of who failed the most? Run ".failboard"')
         await channel.send(embed=failedCount_embed)
 
-        await update_counter(guild_id, "highScore", savedCounter)
-        await update_counter(guild_id, "Counter", 0)
-        await update_counter(guild_id, "lastUser", 0)
+        await update_counter(guildID, "highScore", savedCounter)
+        await update_counter(guildID, "Counter", 0)
+        await update_counter(guildID, "lastUser", 0)
