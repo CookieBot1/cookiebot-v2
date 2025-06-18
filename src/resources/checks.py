@@ -99,6 +99,7 @@ async def lookup_server(guildID):
 
 async def new_server(guildID):
     newGuild = {
-        "IgnoredChannels": [], 
+        "IgnoredChannels": [],
+        "IgnoredChannelDrops": []
     }
     await bot.db.update_user({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
