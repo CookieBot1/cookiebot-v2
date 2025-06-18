@@ -10,9 +10,9 @@ from resources.mrcookie import instance as bot
 from .prompts import user_prompts
 
 # all units in seconds
-PROMPT_TIMEOUT = 75
-PROMPT_COOLDOWN = (3 * 60) + PROMPT_TIMEOUT
-TIME_BETWEEN_USER_MSGS = 90
+PROMPT_TIMEOUT = 75  # time for a drop to timeout
+PROMPT_COOLDOWN = (3 * 60) + PROMPT_TIMEOUT  # time between drops
+TIME_BETWEEN_USER_MSGS = 90  # time between messages for a drop to trigger
 
 # Handles cooldown logic
 channel_cooldowns: IDCooldown = IDCooldown(PROMPT_COOLDOWN)
