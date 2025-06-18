@@ -2,7 +2,7 @@ from resources.mrcookie import instance as bot
 from resources.checks import update_counter, lookup_counter
 import discord
 
-@bot.command(aliases = ["clearcounter"])
+@bot.command(aliases = ["disablecounter"])
 async def resetcounter(ctx):
     guildID = ctx.guild.id
     counterData = await lookup_counter(ctx.guild.id)
