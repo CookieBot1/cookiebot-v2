@@ -49,6 +49,8 @@ async def new_database(userID, guildID):
         "RobChances": 7, ## default rob chance, 70% failure
         "RobExpire": datetime.now(),
         "RobProtection": datetime.now() - timedelta(hours=24),
+        "Counter": 0,
+        "FailCounter": 0,
         "Inventory": "Empty",
     }
     await bot.db.update_user({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
@@ -86,3 +88,17 @@ async def update_counter(guildID, item, new_value):
     await bot.db.update_user(
         {"_id": str(guildID)}, {"$set": {"settings." + "counter" + "." + item: new_value}}
     )
+
+# server settings data
+async def lookup_server(guildID):
+    data = await bot.db.find_user({"_id": str(guildID), f"settings.{"server"}": {"$exists": True}})
+    if data == None:
+        return False
+    else:
+        return data
+
+async def new_server(guildID):
+    newGuild = {
+        "IgnoredChannels": [], 
+    }
+    await bot.db.update_user({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
