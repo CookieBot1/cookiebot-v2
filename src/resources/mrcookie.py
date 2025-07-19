@@ -78,3 +78,8 @@ class MongoDB:
 
     async def get_guild_users(self, guildID: int):
         return await self.db.master_data.find_one({"_id": str(guildID)}, projection={"users": 1})
+    
+    async def get_guilds(self):
+        cursor = self.db.master_data.find(projection={"_id": 1})
+        document = await cursor.to_list(None)
+        return document
