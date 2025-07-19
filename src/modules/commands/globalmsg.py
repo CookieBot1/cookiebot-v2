@@ -1,8 +1,11 @@
+import asyncio
+
 import discord
 from discord.ext import commands
-from resources.mrcookie import instance as bot
+
 from resources.checks import is_admin
-import asyncio
+from resources.mrcookie import instance as bot
+
 
 @bot.command(aliases = ["globalmessage"])
 async def globalmsg(ctx):
@@ -93,9 +96,10 @@ async def globalmsg(ctx):
 
         for guild in data: # add up all the servers
             guildID = guild["_id"]
-            guild = bot.get_guild(guildID) or await bot.fetch_guild(guildID)
 
-            if guild == None: # skip guilds that bot isn't in
+            try:
+                guild = bot.get_guild(guildID) or await bot.fetch_guild(guildID)
+            except discord.HTTPException:
                 continue
 
             channels = await guild.fetch_channels()
