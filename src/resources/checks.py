@@ -10,8 +10,7 @@ async def is_admin(userID):
     for value in ADMIN_USERS:
         if userID == value:
             return True
-        else:
-            return False
+    return False
 
 
 async def is_blacklisted(userID):
