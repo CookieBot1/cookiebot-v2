@@ -6,6 +6,10 @@ from resources.checks import lookup_database, new_database, validate_user, is_bl
 @bot.command(aliases = ["bal", "balance"])
 async def stats(ctx, userID = '0'):
     try:
+        ## set vars
+        guildID = ctx.guild.id
+        guild = ctx.bot.get_guild(guildID)
+
         ## if another user was mentioned, check if they're legit, else use sender ID
         if userID != '0':
             userID = await validate_user(userID, guild)
@@ -15,8 +19,6 @@ async def stats(ctx, userID = '0'):
             userID = ctx.author.id
         
         ## set vars
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
         user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
         
         ## this block fetches their data from the database
@@ -24,6 +26,8 @@ async def stats(ctx, userID = '0'):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
+        
+        userID = str(userID)
         userStreaks = userData["users"][userID]["Streaks"]
         userCookies = userData["users"][userID]["Cookies"]
         userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
