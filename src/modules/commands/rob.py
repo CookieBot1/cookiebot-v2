@@ -38,6 +38,8 @@ async def rob(ctx, userID = '0'):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
+        
+        userID = str(userID)
         userCookies = userData["users"][userID]["Cookies"]
         userRobProt = userData["users"][userID]["RobProtection"]
         userRobChances = userData["users"][userID]["RobChances"]
