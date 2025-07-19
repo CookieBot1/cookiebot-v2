@@ -54,7 +54,7 @@ async def rob(ctx, userID="0"):
         userID = str(userID)
         userCookies = userData["users"][userID]["Cookies"]
         userRobProt = userData["users"][userID]["RobProtection"]
-        userRobChances = userData["users"][userID]["RobChances"]
+        userRobChances = userData["users"][userID]["RobChances"]  # likelihood target user is to be robbed
 
         ## user checks
         if userCookies < 15:
@@ -62,12 +62,20 @@ async def rob(ctx, userID="0"):
         if userRobProt > datetime.now():
             raise Exception("User has an active rob shield, try again later!")
 
-        randomNum = random.choice(range(0, 11))
-        ## successful rob calculation
-        if randomNum > userRobChances:
-            successMessage = success_list[random.choice(range(0, len(success_list)))]
+        randomNum = round(random.uniform(0.0, 11.0), 2)  # random float from 0, up to 11, 2 decimal places.
 
-        # TODO: actually rob someone
+        if randomNum > userRobChances:
+            # success
+            successMessage = success_list[random.choice(range(0, len(success_list)))]
+            baseStolenCookies = random.randint(5, 15)
+
+            successMessage = f"You did it! You stole `{baseStolenCookies}` of their cookies by {successMessage}"
+        else:
+            failMessage = "placeholder - u failed \*womp womp\*"
+
+        # TODO: update rob chance of victim
+        # TODO: update cookies of thief and victim
+        # TODO: send response
 
     ## rob cooldown active message
     except ValueError as Error:
