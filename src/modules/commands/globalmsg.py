@@ -95,14 +95,15 @@ async def globalmsg(ctx):
             guildID = guild["_id"]
             guild = bot.get_guild(guildID) or await bot.fetch_guild(guildID)
 
-            if guild: ## checking if bot is in the guild
-                channels = await guild.fetch_channels()
-                
-                for channel in channels: ## loop through channels looking for only text_channels
-                    if isinstance(channel, discord.TextChannel):
-                        await channel.send(embed=build_embed)
-                        total_servers += 1
-                        break
+            if guild == None: # skip guilds that bot isn't in
+                continue
+
+            channels = await guild.fetch_channels()
+            for channel in channels: ## loop through channels looking for only text_channels
+                if isinstance(channel, discord.TextChannel):
+                    await channel.send(embed=build_embed)
+                    total_servers += 1
+                    break
         await ctx.send("Message has been sent to **" + str(total_servers) + " servers**.")
 
     except asyncio.TimeoutError:
