@@ -96,6 +96,7 @@ async def globalmsg(ctx):
 
         for guild in data: # add up all the servers
             guildID = guild["_id"]
+            is_first_iteration = True
 
             try:
                 guild = bot.get_guild(guildID) or await bot.fetch_guild(guildID)
@@ -104,10 +105,27 @@ async def globalmsg(ctx):
 
             channels = await guild.fetch_channels()
             for channel in channels: ## loop through channels looking for only text_channels
-                if isinstance(channel, discord.TextChannel):
-                    await channel.send(embed=build_embed)
-                    total_servers += 1
-                    break
+                everyone_role = channel.guild.default_role 
+                permissions = channel.permissions_for(everyone_role)
+
+                if isinstance(channel, discord.TextChannel): ## check for text channels only
+                    if is_first_iteration: ## keeping the first random text channel
+                        random_channel = channel
+                        is_first_iteration = False
+                    if permissions.read_messages: ## checking if everyone role can see this channel
+                        permissions.read_messages == True
+                        await channel.send(embed=build_embed)
+                        total_servers += 1
+                        break
+            if is_first_iteration == True: ## no text channel was ever found
+                await ctx.send("Server with no text channels found, skipping..")
+                continue
+            if permissions.read_messages == False: ## no text channel with everyone role allowed ever found, just going with random text channel now
+                await random_channel.send(embed=build_embed)
+                total_servers += 1
+                continue
+            
+
         await ctx.send("Message has been sent to **" + str(total_servers) + " servers**.")
 
     except asyncio.TimeoutError:
