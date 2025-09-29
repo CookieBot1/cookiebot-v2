@@ -19,25 +19,24 @@ from resources.mrcookie import instance as bot
 @bot.command(aliases=["steal"])
 async def rob(ctx, userID="0"):
     try:
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
-        senderID = ctx.author.id
-        sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
+        guild_id = ctx.guild.id
+        guild = ctx.bot.get_guild(guild_id)
+        sender_id = ctx.author.id
+        sender = guild.get_member(int(sender_id)) or await guild.fetch_member(int(sender_id))
 
         ## this block fetches user data from the database
-        guildData = await lookup_database(senderID, guildID)
-        if guildData == False:
-            await new_database(senderID, guildID)
-            guildData = await lookup_database(senderID, guildID)
+        guild_data = await lookup_database(sender_id, guild_id)
+        if guild_data == False:
+            await new_database(sender_id, guild_id)
+            guild_data = await lookup_database(sender_id, guild_id)
 
-        strSenderID = str(senderID)
-        senderCookies = guildData["users"].get(strSenderID, {}).get("Cookies", 0)
-        senderRobExpire = guildData["users"].get(strSenderID, {}).get("RobExpire", datetime.now())
+        sender_cookies = guild_data["users"].get(str(sender_id), {}).get("Cookies", 0)
+        sender_rob_expire = guild_data["users"].get(str(sender_id), {}).get("RobExpire", datetime.now())
 
         ## sender checks
-        if senderCookies < 15:
+        if sender_cookies < 15:
             raise Exception("Whoops, you need at least 15 cookies to rob someone!")
-        if senderRobExpire > datetime.now():
+        if sender_rob_expire > datetime.now():
             raise ValueError()
 
         ## validate the pinged user, if any. if not, get random user from database
@@ -48,8 +47,8 @@ async def rob(ctx, userID="0"):
             if await is_blacklisted(userID):
                 raise Exception("Unable to rob, that user is blacklisted.")
         else:
-            database_users: dict = guildData["users"]
-            database_users.pop(strSenderID)
+            database_users: dict = guild_data["users"]
+            database_users.pop(str(sender_id))
             database_users = list(database_users.keys())
 
             if not database_users:
@@ -58,65 +57,65 @@ async def rob(ctx, userID="0"):
             userID = database_users[random.randrange(0, len(database_users))]
 
         ## checks for the user being robbed
-        userData = await lookup_database(userID, guildID)
-        if userData == False:
-            await new_database(userID, guildID)
-            userData = await lookup_database(userID, guildID)
+        user_data = await lookup_database(userID, guild_id)
+        if user_data == False:
+            await new_database(userID, guild_id)
+            user_data = await lookup_database(userID, guild_id)
 
         userID = str(userID)
-        userCookies = userData["users"][userID]["Cookies"]
-        userRobProt = userData["users"][userID]["RobProtection"]
-        userRobChances = userData["users"][userID]["RobChances"]  # likelihood target user is to be robbed
+        user_cookies = user_data["users"][userID]["Cookies"]
+        user_rob_prot = user_data["users"][userID]["RobProtection"]
+        user_rob_chances = user_data["users"][userID]["RobChances"]  # likelihood target user is to be robbed
 
         ## user checks
-        if userCookies < 15:
+        if user_cookies < 15:
             raise Exception(
                 "Woah there! That user needs at least 15 cookies to be robbed. Leave the poor alone!"
             )
-        if userRobProt > datetime.now():
+        if user_rob_prot > datetime.now():
             raise Exception("This user's currently at home watching their vault, try again later!")
 
-        randomNum = round(random.uniform(0.0, 11.0), 2)  # random float from 0, up to 11, 2 decimal places.
+        random_num = round(random.uniform(0.0, 11.0), 2)  # random float from 0, up to 11, 2 decimal places.
 
         # setup embed variables
         embed_title = None
         embed_desc = None
         embed_color = None
 
-        if randomNum > userRobChances:
+        if random_num > user_rob_chances:
             # success
-            successMessage = success_list[random.choice(range(0, len(success_list)))]
-            stolenCookies = random.randint(5, 10)  # Base of 5-10 cookies to steal
+            success_msg = success_list[random.choice(range(0, len(success_list)))]
+            stolen_cookies = random.randint(5, 10)  # Base of 5-10 cookies to steal
 
-            match userCookies:
-                case userCookies if userCookies <= 100:
-                    stolenCookies += random.randint(1, 5)  # Additional 1-5 cookies
-                case userCookies if userCookies <= 1500:
-                    stolenCookies += int(userCookies * 0.0016)  # Additional 0.16%
-                case userCookies:
-                    stolenCookies += int(userCookies * 0.008)  # Additional 0.8%
+            match user_cookies:
+                case user_cookies if user_cookies <= 100:
+                    stolen_cookies += random.randint(1, 5)  # Additional 1-5 cookies
+                case user_cookies if user_cookies <= 1500:
+                    stolen_cookies += int(user_cookies * 0.0016)  # Additional 0.16%
+                case user_cookies:
+                    stolen_cookies += int(user_cookies * 0.008)  # Additional 0.8%
 
             embed_title = "🥷 Robbery Successful!"
-            embed_desc = f"Mission Accomplished. You stole `{stolenCookies}` of their (<@{userID}>) cookies by {successMessage}!"
+            embed_desc = f"Mission Accomplished. You stole `{stolen_cookies}` of their (<@{userID}>) cookies by {success_msg}!"
             embed_color = EMBED_GREEN
 
             # Make it more difficult to rob the user again + remove cookies
             await update_many_values(
                 userID,
-                guildID,
-                Cookies=userCookies - stolenCookies,
-                RobChances=urc if (urc := userRobChances + 0.2) < 11 else 11,
+                guild_id,
+                Cookies=user_cookies - stolen_cookies,
+                RobChances=urc if (urc := user_rob_chances + 0.2) < 11 else 11,
             )
-            await update_value(senderID, guildID, "Cookies", senderCookies + stolenCookies)
+            await update_value(sender_id, guild_id, "Cookies", sender_cookies + stolen_cookies)
         else:
             # fail
             embed_title = "🚓 Robbery Fumbled"
             embed_color = EMBED_RED
 
-            lostCookies = random.randint(5, 10)  # Base of 5-10 cookies to lose
-            lostCookies += int(senderCookies * 0.008)  # Additional 0.8%
+            lost_cookies = random.randint(5, 10)  # Base of 5-10 cookies to lose
+            lost_cookies += int(sender_cookies * 0.008)  # Additional 0.8%
             await update_value(
-                senderID, guildID, "Cookies", senderCookies - lostCookies
+                sender_id, guild_id, "Cookies", sender_cookies - lost_cookies
             )  # remove cookies from sender
 
             # TODO: Put in fun fail messages
@@ -124,23 +123,23 @@ async def rob(ctx, userID="0"):
 
             gift_chance = random.randint(1, 10)
             if gift_chance <= 2:
-                userCookies += lostCookies
-                embed_desc += f"`{lostCookies}` cookies and YOUR TARGET BLACKMAILED YOU FOR THEM INSTEAD."
+                user_cookies += lost_cookies
+                embed_desc += f"`{lost_cookies}` cookies and YOUR TARGET BLACKMAILED YOU FOR THEM INSTEAD."
             else:
                 embed_desc += (
-                    f"`{lostCookies}` cookies AND your cookies became stale, losing their value forever."
+                    f"`{lost_cookies}` cookies AND your cookies became stale, losing their value forever."
                 )
 
             # Make it easier to rob user until we reach the base count again
             await update_many_values(
                 userID,
-                guildID,
-                RobChances=urc if (urc := userRobChances - 0.2) > 7 else 7,
-                Cookies=userCookies,
+                guild_id,
+                RobChances=urc if (urc := user_rob_chances - 0.2) > 7 else 7,
+                Cookies=user_cookies,
             )  # Update rob chance + update user cookies
 
         cooldown = datetime.now() + timedelta(hours=4)
-        await update_value(senderID, guildID, "RobExpire", cooldown)
+        await update_value(sender_id, guild_id, "RobExpire", cooldown)
 
         embed = discord.Embed(color=embed_color, description=embed_desc)
         embed.set_author(name=embed_title, icon_url=sender.display_avatar)
@@ -150,11 +149,11 @@ async def rob(ctx, userID="0"):
 
     ## rob cooldown active message
     except ValueError:
-        timer = int(senderRobExpire.timestamp())
+        timer = int(sender_rob_expire.timestamp())
         timeout_embed = discord.Embed(
             description="You can rob someone again " + "<t:" + str(timer) + ":R>",
             color=EMBED_RED,
-            timestamp=senderRobExpire,
+            timestamp=sender_rob_expire,
         )
 
         timeout_embed.set_author(
