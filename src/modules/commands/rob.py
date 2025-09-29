@@ -1,10 +1,18 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
 
 from modules.commands.robbing.messages import success_list
-from resources.checks import is_blacklisted, lookup_database, new_database, update_database, validate_user
+from resources.checks import (
+    is_blacklisted,
+    lookup_database,
+    new_database,
+    update_many_values,
+    update_value,
+    validate_user,
+)
+from resources.constants import EMBED_GREEN, EMBED_RED
 from resources.mrcookie import instance as bot
 
 
@@ -12,8 +20,8 @@ from resources.mrcookie import instance as bot
 async def rob(ctx, userID="0"):
     try:
         guildID = ctx.guild.id
-        senderID = ctx.author.id
         guild = ctx.bot.get_guild(guildID)
+        senderID = ctx.author.id
         sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
 
         ## this block fetches user data from the database
@@ -24,7 +32,7 @@ async def rob(ctx, userID="0"):
 
         strSenderID = str(senderID)
         senderCookies = guildData["users"].get(strSenderID, {}).get("Cookies", 0)
-        senderRobExpire = guildData["users"].get(strSenderID, {}).get("RobExpire")
+        senderRobExpire = guildData["users"].get(strSenderID, {}).get("RobExpire", datetime.now())
 
         ## sender checks
         if senderCookies < 15:
@@ -43,6 +51,10 @@ async def rob(ctx, userID="0"):
             database_users: dict = guildData["users"]
             database_users.pop(strSenderID)
             database_users = list(database_users.keys())
+
+            if not database_users:
+                raise Exception("There are no other users to rob! 😶")
+
             userID = database_users[random.randrange(0, len(database_users))]
 
         ## pinged/random user checks
@@ -64,25 +76,58 @@ async def rob(ctx, userID="0"):
 
         randomNum = round(random.uniform(0.0, 11.0), 2)  # random float from 0, up to 11, 2 decimal places.
 
+        # setup embed variables
+        embed_title = None
+        embed_desc = None
+        embed_color = None
+
         if randomNum > userRobChances:
             # success
             successMessage = success_list[random.choice(range(0, len(success_list)))]
             baseStolenCookies = random.randint(5, 15)
 
-            successMessage = f"You did it! You stole `{baseStolenCookies}` of their cookies by {successMessage}"
-        else:
-            failMessage = "placeholder - u failed \*womp womp\*"
+            # TODO: Apply higher amount of cookies stolen based on number of cookies the victim has
 
-        # TODO: update rob chance of victim
-        # TODO: update cookies of thief and victim
-        # TODO: send response
+            embed_title = "🥷 Robbery Successful!"
+            embed_desc = f"Mission Accomplished. You stole `{baseStolenCookies}` of their (<@{userID}>) cookies by {successMessage}!"
+            embed_color = EMBED_GREEN
+
+            # Make it more difficult to rob the user again + remove cookies
+            await update_many_values(
+                userID,
+                guildID,
+                Cookies=userCookies - baseStolenCookies,
+                RobChances=urc if (urc := userRobChances + 0.2) < 11 else 11,
+            )
+            await update_value(senderID, guildID, "Cookies", senderCookies + baseStolenCookies)
+        else:
+            # fail
+            embed_title = "🚓 Robbery Fumbled"
+            embed_desc = r"SCRAM, IT'S THE COPS  - u failed \*womp womp\*"
+            embed_color = EMBED_RED
+
+            # Decrease rob chance back until we reach 7 again
+            await update_many_values(
+                userID, guildID, RobChances=urc if (urc := userRobChances - 0.2) > 7 else 7
+            )
+
+            # TODO: Remove cookies from the robber for fumbling their attempt (& give to victim?)
+
+        cooldown = datetime.now() + timedelta(hours=4)
+        await update_value(senderID, guildID, "RobExpire", cooldown)
+
+        embed = discord.Embed(color=embed_color, description=embed_desc)
+        embed.set_author(name=embed_title, icon_url=sender.display_avatar)
+        embed.timestamp = cooldown
+        embed.set_footer(text=f"Your crew will be ready again by")
+        await ctx.send(embed=embed)
 
     ## rob cooldown active message
-    except ValueError as Error:
+    except ValueError:
         timer = int(senderRobExpire.timestamp())
         timeout_embed = discord.Embed(
             description="You can rob someone again " + "<t:" + str(timer) + ":R>",
-            color=0x992D22,
+            color=EMBED_RED,
             timestamp=senderRobExpire,
         )
 
@@ -90,5 +135,5 @@ async def rob(ctx, userID="0"):
             name="Easy there " + str(sender.display_name) + "!", icon_url=sender.display_avatar
         )
         await ctx.send(embed=timeout_embed)
-    except Exception as Error:
-        await ctx.send(f"{type(Error)}: {Error}")
+    except Exception as error:
+        await ctx.send(f"{type(error)}: {error}")
