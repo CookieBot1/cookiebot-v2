@@ -31,12 +31,12 @@ async def rob(ctx, userID="0"):
             guild_data = await lookup_database(sender_id, guild_id)
 
         sender_cookies = guild_data["users"].get(str(sender_id), {}).get("Cookies", 0)
-        sender_rob_expire = guild_data["users"].get(str(sender_id), {}).get("RobExpire", datetime.now())
+        sender_rob_expiry = guild_data["users"].get(str(sender_id), {}).get("RobExpire", datetime.now())
 
         ## sender checks
         if sender_cookies < 15:
             raise Exception("Whoops, you need at least 15 cookies to rob someone!")
-        if sender_rob_expire > datetime.now():
+        if sender_rob_expiry > datetime.now():
             raise ValueError()
 
         ## validate the pinged user, if any. if not, get random user from database
@@ -149,11 +149,11 @@ async def rob(ctx, userID="0"):
 
     ## rob cooldown active message
     except ValueError:
-        timer = int(sender_rob_expire.timestamp())
+        timer = int(sender_rob_expiry.timestamp())
         timeout_embed = discord.Embed(
             description="You can rob someone again " + "<t:" + str(timer) + ":R>",
             color=EMBED_RED,
-            timestamp=sender_rob_expire,
+            timestamp=sender_rob_expiry,
         )
 
         timeout_embed.set_author(
