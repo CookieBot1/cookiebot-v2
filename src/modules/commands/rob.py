@@ -40,7 +40,7 @@ async def rob(ctx, userID="0"):
         if senderRobExpire > datetime.now():
             raise ValueError()
 
-        ## validate the pinged user, if any
+        ## validate the pinged user, if any. if not, get random user from database
         if userID != "0":
             userID = await validate_user(userID, guild)
             if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id:
@@ -57,7 +57,7 @@ async def rob(ctx, userID="0"):
 
             userID = database_users[random.randrange(0, len(database_users))]
 
-        ## pinged/random user checks
+        ## checks for the user being robbed
         userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
@@ -70,9 +70,11 @@ async def rob(ctx, userID="0"):
 
         ## user checks
         if userCookies < 15:
-            raise Exception("Woah there! User needs at least 15 cookies to be robbed.")
+            raise Exception(
+                "Woah there! That user needs at least 15 cookies to be robbed. Leave the poor alone!"
+            )
         if userRobProt > datetime.now():
-            raise Exception("User has an active rob shield, try again later!")
+            raise Exception("This user's currently at home watching their vault, try again later!")
 
         randomNum = round(random.uniform(0.0, 11.0), 2)  # random float from 0, up to 11, 2 decimal places.
 
@@ -103,10 +105,11 @@ async def rob(ctx, userID="0"):
         else:
             # fail
             embed_title = "🚓 Robbery Fumbled"
+            # TODO: Add fun fail messages
             embed_desc = r"SCRAM, IT'S THE COPS  - u failed \*womp womp\*"
             embed_color = EMBED_RED
 
-            # Decrease rob chance back until we reach 7 again
+            # Make it easier to rob user until we reach the base count again
             await update_many_values(
                 userID, guildID, RobChances=urc if (urc := userRobChances - 0.2) > 7 else 7
             )
