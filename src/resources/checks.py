@@ -64,6 +64,13 @@ async def update_value(userID, guildID, item, new_value):
         {"_id": str(guildID)}, {"$set": {"users." + str(userID) + "." + item: new_value}}
     )
 
+# Update multiple values for user db data using kwargs
+async def update_many_values(userID, guildID, **kwargs):
+    base_str = f"users.{str(userID)}."
+    set_dict = {base_str + key: val for key, val in kwargs.items()} # expand kwargs to format
+
+    await bot.db.update_user({"_id": str(guildID)}, {"$set": set_dict})
+
 
 # counter data
 async def lookup_counter(guildID):
