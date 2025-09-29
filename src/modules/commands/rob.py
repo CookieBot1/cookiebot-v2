@@ -86,35 +86,58 @@ async def rob(ctx, userID="0"):
         if randomNum > userRobChances:
             # success
             successMessage = success_list[random.choice(range(0, len(success_list)))]
-            baseStolenCookies = random.randint(5, 15)
+            stolenCookies = random.randint(5, 10)  # Base of 5-10 cookies to steal
 
-            # TODO: Apply higher amount of cookies stolen based on number of cookies the victim has
+            match userCookies:
+                case userCookies if userCookies <= 100:
+                    stolenCookies += random.randint(1, 5)  # Additional 1-5 cookies
+                case userCookies if userCookies <= 1500:
+                    stolenCookies += int(userCookies * 0.0016)  # Additional 0.16%
+                case userCookies:
+                    stolenCookies += int(userCookies * 0.008)  # Additional 0.8%
 
             embed_title = "🥷 Robbery Successful!"
-            embed_desc = f"Mission Accomplished. You stole `{baseStolenCookies}` of their (<@{userID}>) cookies by {successMessage}!"
+            embed_desc = f"Mission Accomplished. You stole `{stolenCookies}` of their (<@{userID}>) cookies by {successMessage}!"
             embed_color = EMBED_GREEN
 
             # Make it more difficult to rob the user again + remove cookies
             await update_many_values(
                 userID,
                 guildID,
-                Cookies=userCookies - baseStolenCookies,
+                Cookies=userCookies - stolenCookies,
                 RobChances=urc if (urc := userRobChances + 0.2) < 11 else 11,
             )
-            await update_value(senderID, guildID, "Cookies", senderCookies + baseStolenCookies)
+            await update_value(senderID, guildID, "Cookies", senderCookies + stolenCookies)
         else:
             # fail
             embed_title = "🚓 Robbery Fumbled"
-            # TODO: Add fun fail messages
-            embed_desc = r"SCRAM, IT'S THE COPS  - u failed \*womp womp\*"
             embed_color = EMBED_RED
+
+            lostCookies = random.randint(5, 10)  # Base of 5-10 cookies to lose
+            lostCookies += int(senderCookies * 0.008)  # Additional 0.8%
+            await update_value(
+                senderID, guildID, "Cookies", senderCookies - lostCookies
+            )  # remove cookies from sender
+
+            # TODO: Put in fun fail messages
+            embed_desc = "SCRAM, IT'S THE COPS  - u failed. SO you lost "
+
+            gift_chance = random.randint(1, 10)
+            if gift_chance <= 2:
+                userCookies += lostCookies
+                embed_desc += f"`{lostCookies}` cookies and YOUR TARGET BLACKMAILED YOU FOR THEM INSTEAD."
+            else:
+                embed_desc += (
+                    f"`{lostCookies}` cookies AND your cookies became stale, losing their value forever."
+                )
 
             # Make it easier to rob user until we reach the base count again
             await update_many_values(
-                userID, guildID, RobChances=urc if (urc := userRobChances - 0.2) > 7 else 7
-            )
-
-            # TODO: Remove cookies from the robber for fumbling their attempt (& give to victim?)
+                userID,
+                guildID,
+                RobChances=urc if (urc := userRobChances - 0.2) > 7 else 7,
+                Cookies=userCookies,
+            )  # Update rob chance + update user cookies
 
         cooldown = datetime.now() + timedelta(hours=4)
         await update_value(senderID, guildID, "RobExpire", cooldown)
