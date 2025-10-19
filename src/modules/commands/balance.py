@@ -46,7 +46,6 @@ async def balance(ctx, userID = '0'):
         stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
         if userDailyMultiplier != 0:
             stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
-        stats_embed.add_field(name = "Inventory", value = "WIP", inline = False)
 
         stats_embed.set_thumbnail(url = user.display_avatar)
         await ctx.send(embed=stats_embed)
