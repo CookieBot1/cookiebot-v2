@@ -26,7 +26,7 @@ class SimpleUser:
         )
 
 
-@bot.command(aliases=["counterlb, countlb, countleaderboard"])
+@bot.command(aliases=["counterlb", "countlb", "countleaderboard"])
 @commands.cooldown(1, 45, commands.BucketType.guild)
 async def countboard(ctx: commands.Context):
     if ctx.guild is None:
