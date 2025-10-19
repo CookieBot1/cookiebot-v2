@@ -20,7 +20,7 @@ async def is_blacklisted(userID):
         return False
 
 
-async def validate_user(userID, guild):
+async def validate_user(userID):
     userID = userID.strip("<@!>")
     if userID == "0" or userID.isdigit() == False or len(userID) < 17:
         return None
