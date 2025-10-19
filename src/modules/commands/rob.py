@@ -39,13 +39,21 @@ async def rob(ctx, userID="0"):
         if sender_rob_cooldown > datetime.now():
             raise ValueError()
 
-        ## validate the pinged user, if any. if not, get random user from database
+        ## validate the pinged user, if any. if empty user parameter, get random user from database
         if userID != "0":
             userID = await validate_user(userID, guild)
             if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id:
                 raise Exception("Invalid user, try again!")
             if await is_blacklisted(userID):
                 raise Exception("Unable to rob, that user is blacklisted.")
+            
+            ## checks for the user being robbed
+            user_data = await lookup_database(userID, guild_id)
+            if user_data == False:
+                await new_database(userID, guild_id)
+                user_data = await lookup_database(userID, guild_id)
+            
+        ## find a random user from database
         else:
             database_users: dict = guild_data["users"]
             database_users.pop(str(sender_id))
@@ -53,15 +61,21 @@ async def rob(ctx, userID="0"):
 
             if not database_users:
                 raise Exception("There are no other users to rob! 😶")
+            
+            ## assign a random user to be robbed if no user parameter is given
+            counter = 0
+            user_found = False
+            while counter < len(database_users): 
+                userID = database_users[random.randrange(0, len(database_users))]
+                user_data = await lookup_database(userID, guild_id)
 
-            userID = database_users[random.randrange(0, len(database_users))]
-
-        ## checks for the user being robbed
-        user_data = await lookup_database(userID, guild_id)
-        if user_data == False:
-            await new_database(userID, guild_id)
-            user_data = await lookup_database(userID, guild_id)
-
+                if user_data["users"][userID]["Cookies"] >= 15:
+                    user_found = True
+                    break
+                counter += 1
+            
+            if user_found == False:
+                raise Exception("No other user has enough cookies! 😶")
         userID = str(userID)
         user_cookies = user_data["users"][userID]["Cookies"]
         user_rob_prot = user_data["users"][userID]["RobProtection"]
@@ -147,6 +161,7 @@ async def rob(ctx, userID="0"):
         embed.set_footer(text=f"Your crew will be ready again by")
         await ctx.send(embed=embed)
 
+
     ## rob cooldown active message
     except ValueError:
         timer = int(sender_rob_cooldown.timestamp())
@@ -161,4 +176,4 @@ async def rob(ctx, userID="0"):
         )
         await ctx.send(embed=timeout_embed)
     except Exception as error:
-        await ctx.send(f"{type(error)}: {error}")
+        await ctx.send(error)
