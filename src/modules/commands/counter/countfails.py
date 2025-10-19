@@ -26,7 +26,7 @@ class SimpleUser:
         )
 
 
-@bot.command(aliases=["failboard, counterfails"])
+@bot.command(aliases=["failboard", "counterfails"])
 @commands.cooldown(1, 45, commands.BucketType.guild)
 async def countfails(ctx: commands.Context):
     if ctx.guild is None:
