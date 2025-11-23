@@ -15,7 +15,7 @@ async def generate(ctx, userID = '0', amount = "0"):
 
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
-        userID = await validate_user(userID, guild)
+        userID = await validate_user(userID)
 
         if userID == None or guild.get_member(int(userID)) is None: raise Exception("Invalid user, try again!")
         if await is_blacklisted(userID): raise Exception("Illegal activity! You can't generate for a blacklisted user!")

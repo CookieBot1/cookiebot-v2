@@ -12,7 +12,7 @@ async def stats(ctx, userID = '0'):
 
         ## if another user was mentioned, check if they're legit, else use sender ID
         if userID != '0':
-            userID = await validate_user(userID, guild)
+            userID = await validate_user(userID)
             if userID == None or guild.get_member(int(userID)) is None: raise Exception("Invalid user, try again!")
             if await is_blacklisted(userID): raise Exception("Can't show stats, user is blacklisted.")
         else:

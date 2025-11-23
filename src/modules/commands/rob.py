@@ -41,7 +41,7 @@ async def rob(ctx, userID="0"):
 
         ## validate the pinged user, if any. if empty user parameter, get random user from database
         if userID != "0":
-            userID = await validate_user(userID, guild)
+            userID = await validate_user(userID)
             if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id:
                 raise Exception("Invalid user, try again!")
             if await is_blacklisted(userID):
