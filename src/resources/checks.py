@@ -110,3 +110,9 @@ async def new_server(guildID):
         "IgnoredChannelDrops": [],
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
+
+
+async def update_ignored_drops(guildID, new_value: list):
+    await bot.db.update_one(
+        {"_id": str(guildID)}, {"$set": {"settings.server.IgnoredChannelDrops": new_value}}
+    )
