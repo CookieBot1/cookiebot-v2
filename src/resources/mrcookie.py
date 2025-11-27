@@ -73,12 +73,12 @@ class MongoDB:
         document = await self.db.master_data.find_one(doc)
         return document
 
-    async def update_user(self, dict, set):
+    async def update_one(self, dict, set):
         await self.db.master_data.update_one(dict, set, upsert=True)
 
     async def get_guild_users(self, guildID: int):
         return await self.db.master_data.find_one({"_id": str(guildID)}, projection={"users": 1})
-    
+
     async def get_guilds(self):
         cursor = self.db.master_data.find(projection={"_id": 1})
         document = await cursor.to_list(None)

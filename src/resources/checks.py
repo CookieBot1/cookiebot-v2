@@ -45,31 +45,30 @@ async def new_database(userID, guildID):
         "DailyMultiplier": 0,
         "DailyMultExpire": datetime.now(),
         "RobExpire": datetime.now() - timedelta(hours=24),
-        "RobChances": 7, ## default rob chance, 70% failure
+        "RobChances": 7,  ## default rob chance, 70% failure
         "RobExpire": datetime.now(),
         "RobProtection": datetime.now() - timedelta(hours=24),
         "Counter": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
     }
-    await bot.db.update_user({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
 
 async def update_database(userID, guildID, updated_dict):
-    await bot.db.update_user({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**updated_dict}}})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**updated_dict}}})
 
 
 async def update_value(userID, guildID, item, new_value):
-    await bot.db.update_user(
-        {"_id": str(guildID)}, {"$set": {"users." + str(userID) + "." + item: new_value}}
-    )
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID) + "." + item: new_value}})
+
 
 # Update multiple values for user db data using kwargs
 async def update_many_values(userID, guildID, **kwargs):
     base_str = f"users.{str(userID)}."
-    set_dict = {base_str + key: val for key, val in kwargs.items()} # expand kwargs to format
+    set_dict = {base_str + key: val for key, val in kwargs.items()}  # expand kwargs to format
 
-    await bot.db.update_user({"_id": str(guildID)}, {"$set": set_dict})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": set_dict})
 
 
 # counter data
@@ -83,17 +82,18 @@ async def lookup_counter(guildID):
 
 async def new_counter(guildID):
     newGuild = {
-        "Channel": 0, 
-        "Counter": 0, 
+        "Channel": 0,
+        "Counter": 0,
         "lastUser": 0,
     }
-    await bot.db.update_user({"_id": str(guildID)}, {"$set": {"settings." + "counter": {**newGuild}}})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "counter": {**newGuild}}})
 
 
 async def update_counter(guildID, item, new_value):
-    await bot.db.update_user(
+    await bot.db.update_one(
         {"_id": str(guildID)}, {"$set": {"settings." + "counter" + "." + item: new_value}}
     )
+
 
 # server settings data
 async def lookup_server(guildID):
@@ -103,9 +103,10 @@ async def lookup_server(guildID):
     else:
         return data
 
+
 async def new_server(guildID):
     newGuild = {
         "IgnoredChannels": [],
-        "IgnoredChannelDrops": []
+        "IgnoredChannelDrops": [],
     }
-    await bot.db.update_user({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
