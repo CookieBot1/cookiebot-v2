@@ -26,9 +26,21 @@ channel_last_message: dict[str, discord.Message] = dict()
 async def on_message(message: discord.Message):
     channel_id = str(message.channel.id)
 
-    # Ignore bot messages, ignore when channel is locked.
-    if message.author.bot or channel_id in channel_lock or type(message.channel) != discord.TextChannel:
+    # Ignore bot messages, ignore when channel is locked. Also ignores non text channels, and DMs.
+    if (
+        message.author.bot
+        or channel_id in channel_lock
+        or type(message.channel) != discord.TextChannel
+        or message.guild is None
+    ):
         return
+
+    # Check if the channel is set to be ignored for drops.
+    server_data = await checks.lookup_server(message.guild.id)
+    if server_data is not False:
+        ign_chn_drops = server_data["settings"]["server"].get("IgnoredChannelDrops", [])
+        if message.channel.id in ign_chn_drops:
+            return
 
     last_msg = channel_last_message.get(channel_id)
     if (
