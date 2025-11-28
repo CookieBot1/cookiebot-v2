@@ -83,7 +83,7 @@ async def on_command_error(ctx: commands.Context, error: commands.CommandError):
 
 
 # Ref: https://github.com/One-Nub/helper-bot/blob/main/src/modules/auto_response/autoresponder.py
-@bot.add_button_handler("lb-button")
+@bot.add_button_handler("countboard-button")
 async def page_buttons(interaction: discord.Interaction, view: discord.ui.View | None):
     custom_id_data = interaction.data["custom_id"].split(":")  # type: ignore
     custom_id_data.pop(0)
@@ -132,14 +132,14 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
         style=discord.ButtonStyle.secondary,
         label=UNICODE_LEFT,
         disabled=True if prev_page_index <= 0 and new_page_index != 1 else False,
-        custom_id=f"lb-button:{interaction.user.id}:{prev_page_index}:{max_pages}",
+        custom_id=f"countboard-button:{interaction.user.id}:{prev_page_index}:{max_pages}",
     )
 
     right_button = discord.ui.Button(
         style=discord.ButtonStyle.secondary,
         label=UNICODE_RIGHT,
         disabled=True if next_page_index == max_pages else False,
-        custom_id=f"lb-button:{interaction.user.id}:{next_page_index}:{max_pages}",
+        custom_id=f"countboard-button:{interaction.user.id}:{next_page_index}:{max_pages}",
     )
 
     view.add_item(left_button)
