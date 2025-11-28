@@ -5,7 +5,7 @@ from discord.ext import commands
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted, validate_user, is_admin
 
 @bot.command(aliases = ["gen"])
-@commands.cooldown(1, 30)
+@commands.cooldown(1, 5)
 async def generate(ctx, userID = '0', amount = "0"):
     try:
         ## this will only be for premium or whitelisted servers, for now it's locked to bot admins
