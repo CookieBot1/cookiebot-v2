@@ -52,14 +52,14 @@ async def countboard(ctx: commands.Context):
         style=discord.ButtonStyle.secondary,
         label=UNICODE_LEFT,
         disabled=True,
-        custom_id=f"lb-button:{ctx.author.id}:0:{max_pages}",
+        custom_id=f"countboard-button:{ctx.author.id}:0:{max_pages}",
     )
 
     right_button = discord.ui.Button(
         style=discord.ButtonStyle.secondary,
         label=UNICODE_RIGHT,
         disabled=True if max_pages == 1 else False,
-        custom_id=f"lb-button:{ctx.author.id}:1:{max_pages}",
+        custom_id=f"countboard-button:{ctx.author.id}:1:{max_pages}",
     )
 
     view.add_item(left_button)
