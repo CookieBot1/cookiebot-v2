@@ -20,11 +20,14 @@ class SimpleUser:
 
     async def lb_output(self) -> str:
         user = bot.get_user(int(self.uid)) or await bot.fetch_user(int(self.uid))
-        return (
-            f"**#{self.position}. {user.global_name}**"
-            f"\n{self.cookies} Number{'s' if self.cookies != 1 else ''}"
-        )
+        if user.global_name == None: lb_user = user.name
+        else: lb_user = user.global_name
 
+        return (
+            f"**#{self.position}. {lb_user}**"
+            f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
+        )
+     
 
 @bot.command(aliases=["counterlb", "countlb", "countleaderboard"])
 @commands.cooldown(1, 45, commands.BucketType.guild)
