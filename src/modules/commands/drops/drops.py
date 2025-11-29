@@ -78,6 +78,9 @@ async def process_trigger(channel: discord.TextChannel):
     prompt_embed.set_footer(text=f"BE QUICK! They're gonna burn after {PROMPT_TIMEOUT} seconds!! 🔥")
     prompt_message: discord.Message = await channel.send(embed=prompt_embed)
 
+    # Give prompt message to channel processor so we can delete it after someone gets it.
+    ch_prsr.store_prompt_message(prompt_message)
+
     # Listen for messages, then stop after asyncio.sleep.
     bot.add_listener(ch_prsr.message_listener, name="on_message")
     await asyncio.sleep(PROMPT_TIMEOUT)
@@ -86,8 +89,6 @@ async def process_trigger(channel: discord.TextChannel):
     if not ch_prsr.complete:
         await prompt_message.reply(f"-# you guys suck at this 🫵😂... try again next time ", delete_after=7)
         await asyncio.sleep(7)
-        await prompt_message.delete()
-    else:
         await prompt_message.delete()
 
     channel_lock.remove(str(channel.id))
@@ -100,6 +101,10 @@ class ChannelProcessor:
         self.answer = user_prompts[self.prompt].lower()
         self.reward = random.randint(1, 16)
         self.complete = False
+        self.prompt_message = None
+
+    def store_prompt_message(self, prompt: discord.Message):
+        self.prompt_message = prompt
 
     async def message_listener(self, message: discord.Message):
         if message.author.bot or str(message.channel.id) != self.channel_id or self.complete:
@@ -128,7 +133,10 @@ class ChannelProcessor:
             ),
         )
 
-        await message.reply(embed=prompt_embed, mention_author=False)
+        await message.reply(embed=prompt_embed, mention_author=False, delete_after=8)
+        await message.delete(delay=8)
+        if self.prompt_message:
+            await self.prompt_message.delete(delay=7)
 
         guild_id = message.guild.id
         guild_data = await checks.lookup_database(author_id, guild_id)
