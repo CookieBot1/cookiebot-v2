@@ -17,8 +17,8 @@ async def freezestreaks(ctx):
             await new_database(sender_id, guild_id)
             guild_data = await lookup_database(sender_id, guild_id)
 
-        for userID in guild_data["users"]:
-            guild_data["users"][userID]["Cookies"]
+        await ctx.send("Freezing all streaks... This may take a moment.")
+        await ctx.send(guild_data)
 
 
         
