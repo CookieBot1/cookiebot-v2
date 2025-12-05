@@ -25,7 +25,7 @@ class SimpleUser:
 
         return (
             f"**#{self.position}. {lb_user}**"
-            f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
+            f"\n{self.cookies} Number{'s' if self.cookies != 1 else ''}"
         )
 
 
