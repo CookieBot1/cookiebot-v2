@@ -18,7 +18,9 @@ async def freezestreaks(ctx):
             guild_data = await lookup_database(sender_id, guild_id)
 
         await ctx.send("Freezing all streaks... This may take a moment.")
-        await ctx.send(guild_data)
+        for userid in guild_data["users"]:
+            if guild_data["users"][userid]["Streaks"] > 1:
+                await ctx.send("Found a user with a streak")
 
 
         
