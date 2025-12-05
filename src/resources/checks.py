@@ -35,6 +35,14 @@ async def lookup_database(userID, guildID):
         return data
     else:
         return False
+    
+## REMOVE!!!!!!!!!
+async def lookup_old_database(userID, guildID):
+    data = await bot.db.find_old_user({"_id": str(guildID), f"users.{userID}": {"$exists": True}})
+    if data != None:
+        return data
+    else:
+        return False
 
 
 async def new_database(userID, guildID):

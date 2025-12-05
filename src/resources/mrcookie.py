@@ -72,6 +72,12 @@ class MongoDB:
     async def find_user(self, doc):
         document = await self.db.master_data.find_one(doc)
         return document
+    
+    ##--------------- REMOVE
+    # master_data collection
+    async def find_old_user(self, doc):
+        document = await self.db.cookieDict.find_one(doc)
+        return document
 
     async def update_one(self, dict, set):
         await self.db.master_data.update_one(dict, set, upsert=True)
