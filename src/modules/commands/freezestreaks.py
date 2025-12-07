@@ -25,7 +25,9 @@ async def freezestreaks(ctx):
                     else: the_name = user.global_name
                     await ctx.send("User is: " + the_name)
 
-                    guild_data["users"][userid]["Frozen"] = True    
+                    guild_data["users"][userid]["Frozen"] = True
+                    guild_data["users"][userid]["ExpTime"] = datetime.now() + timedelta(weeks = 52)
+
         await ctx.send("Cycle finished.")
 
         
