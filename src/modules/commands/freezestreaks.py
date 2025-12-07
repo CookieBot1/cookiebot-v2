@@ -1,6 +1,6 @@
 from resources.mrcookie import instance as bot
 from discord.ext import commands
-from resources.checks import is_admin, lookup_old_database
+from resources.checks import is_admin, lookup_old_database, update_old_database
 from datetime import datetime, timedelta
 
 @bot.command()
@@ -27,6 +27,8 @@ async def freezestreaks(ctx):
 
                     guild_data["users"][userid]["Frozen"] = True
                     guild_data["users"][userid]["ExpTime"] = datetime.now() + timedelta(weeks = 52)
+
+                    await update_old_database(userid, guild_id, guild_data["users"][userid])
 
         await ctx.send("Cycle finished.")
 

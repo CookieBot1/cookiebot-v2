@@ -43,6 +43,8 @@ async def lookup_old_database(userID, guildID):
         return data
     else:
         return False
+async def update_old_database(userID, guildID, updated_dict):
+    await bot.db.update_old_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**updated_dict}}})
 
 
 async def new_database(userID, guildID):
