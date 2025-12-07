@@ -1,7 +1,7 @@
 from resources.mrcookie import instance as bot
 from discord.ext import commands
 from resources.checks import is_admin, lookup_old_database
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @bot.command()
 async def freezestreaks(ctx):
@@ -18,7 +18,7 @@ async def freezestreaks(ctx):
         await ctx.send("Freezing all streaks... This may take a moment.")
         for userid in guild_data["users"]:
             if guild_data["users"][userid]["Streaks"] > 1:
-                if guild_data["users"][userid]["ExpTime"] > datetime.now():
+                if datetime.now() < guild_data["users"][userid]["ExpTime"] or datetime.now() - timedelta(hours = 23) > guild_data["users"][userid]["ExpTime"]:
                     await ctx.send("Found a user with an active streak")
                     user = guild.get_member(int(userid)) or await guild.fetch_member(int(userid))
                     if user.global_name == None: the_name = userid
