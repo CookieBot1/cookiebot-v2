@@ -23,7 +23,9 @@ async def freezestreaks(ctx):
                     user = guild.get_member(int(userid)) or await guild.fetch_member(int(userid))
                     if user.global_name == None: the_name = userid
                     else: the_name = user.global_name
-                    await ctx.send("User is: " + the_name)     
+                    await ctx.send("User is: " + the_name)
+
+                    guild_data["users"][userid]["Frozen"] = True    
         await ctx.send("Cycle finished.")
 
         
