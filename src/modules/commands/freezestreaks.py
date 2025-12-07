@@ -18,7 +18,8 @@ async def freezestreaks(ctx):
         for userid in guild_data["users"]:
             if guild_data["users"][userid]["Streaks"] > 1:
                 await ctx.send("Found a user with a streak")
-                ##guild_data["users"][userid]["Streaks"]
+                user = guild.get_member(int(userid)) or await guild.fetch_member(int(userid))
+                await ctx.send("User is: " + user.display_name)
         await ctx.send("Cycle finished.")
 
         
