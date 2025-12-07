@@ -18,11 +18,11 @@ async def freezestreaks(ctx):
         await ctx.send("Freezing all streaks... This may take a moment.")
         for userid in guild_data["users"]:
             if guild_data["users"][userid]["Streaks"] > 1:
-                if guild_data["users"][userid]["ExpTime"] < datetime.now():
+                if guild_data["users"][userid]["ExpTime"] > datetime.now():
                     await ctx.send("Found a user with an active streak")
                     user = guild.get_member(int(userid)) or await guild.fetch_member(int(userid))
-                    if user.display_name == None: the_name = user.name
-                    else: the_name = user.display_name
+                    if user.global_name == None: the_name = userid
+                    else: the_name = user.global_name
                     await ctx.send("User is: " + the_name)     
         await ctx.send("Cycle finished.")
 
