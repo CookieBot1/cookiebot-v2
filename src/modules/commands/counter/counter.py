@@ -107,6 +107,7 @@ async def on_message(message: discord.Message):
             userData = await lookup_database(userID, guildID)
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
+        highScore = counterData["settings"]["counter"]["highScore"]
 
         if parsed == savedCounter + 1:
             if userID != lastUser:
@@ -116,6 +117,10 @@ async def on_message(message: discord.Message):
                 await update_counter(guildID, "lastUser", userID)
                 await update_value(userID, guildID, "Counter", userCounter)
                 await message.add_reaction("✅")
+
+                if savedCounter > highScore:
+                    highScore = savedCounter
+                    await update_counter(guildID, "highScore", highScore)
             else:
                 raise ValueError(user.mention + " FAILED AT **" + str(savedCounter) + "**!! You can't count two times in a row.")
         else:
@@ -135,6 +140,5 @@ async def on_message(message: discord.Message):
         failedCount_embed.set_footer(text = 'Want to see a leaderboard of who failed the most? Run ".failboard"')
         await channel.send(embed=failedCount_embed)
 
-        await update_counter(guildID, "highScore", savedCounter)
         await update_counter(guildID, "Counter", 0)
         await update_counter(guildID, "lastUser", 0)
