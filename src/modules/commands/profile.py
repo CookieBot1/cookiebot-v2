@@ -50,10 +50,13 @@ async def profile(ctx, userID = '0'):
         if userDailyMultiplier != 0:
             stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
         stats_embed.add_field(name = "Rank", value = "WIP", inline = True)
-        stats_embed.add_field(name = "Numbers Counted", value = str(userCounter) + " Numbers", inline = True)
+        stats_embed.add_field(name = "Num's Counted", value = str(userCounter) + " Numbers", inline = True)
         stats_embed.add_field(name = "Count Fails", value = str(userFailCounter) + " Fails", inline = True)
+        stats_embed.add_field(name = "Count Saves", value = "WIP", inline = True)
 
         stats_embed.set_thumbnail(url = user.display_avatar)
+        stats_embed.set_footer(text = "Want to customize this? (coming soon)")
+        
         await ctx.send(embed=stats_embed)
     
     except Exception as Error:
