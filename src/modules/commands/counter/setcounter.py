@@ -21,7 +21,7 @@ async def setcounter(ctx):
     prompt = await ctx.send(
         "Enable math expressions in the counting channel? "
         "(example: `1+1` counts as `2`)\n"
-        "Reply with `yes` or `no` within **30 seconds**."
+        "Reply with `yes` or `no` within **30 seconds**. You can always change this later by running.. <cmd coming soon>"
     )
 
     def check(m: discord.Message) -> bool:
