@@ -34,9 +34,10 @@ async def profile(ctx, userID = '0'):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
 
-        ## send the embed
+        ## build the embed
         stats_embed = discord.Embed(
             title = str(user.display_name) + "'s Stats",
+            description = "Bio coming soon!",
             color = 0x7289da,
             )
     
