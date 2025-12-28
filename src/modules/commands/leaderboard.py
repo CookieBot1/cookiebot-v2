@@ -9,6 +9,8 @@ from discord.ext import commands
 from resources.constants import UNICODE_LEFT, UNICODE_RIGHT
 from resources.mrcookie import instance as bot
 
+import traceback
+
 MAX_USERS_PER_PAGE = 10
 
 
@@ -16,6 +18,7 @@ MAX_USERS_PER_PAGE = 10
 class SimpleUser:
     uid: str
     cookies: int
+    lbtype: str = field(default="cookies", kw_only=True)
     position: Optional[int] = field(default=0, kw_only=True)
 
     async def lb_output(self) -> str:
@@ -23,17 +26,38 @@ class SimpleUser:
         if user.global_name == None: lb_user = user.name
         else: lb_user = user.global_name
 
+        label_map = {
+            "cookies": "Cookie",
+            "count": "Number",
+            "countfails": "Fail",
+        }
+        label = label_map.get(self.lbtype, "Value")
+        plural = "s" if self.cookies != 1 else ""
         return (
-            f"**#{self.position}. {lb_user}**"
-            f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
+            f"**#{self.position}. {lb_user}**\n"
+            f"{self.cookies} {label}{plural}"
         )
 
 
 @bot.command(aliases=["lb"])
-@commands.cooldown(1, 45, commands.BucketType.guild)
-async def leaderboard(ctx: commands.Context):
+@commands.cooldown(1, 20, commands.BucketType.member)
+async def leaderboard(ctx: commands.Context, lbtype: str = "cookies"):
     if ctx.guild is None:
         return await ctx.reply("This command can only be run in a server!", delete_after=7)
+
+    lbtype = lbtype.lower()
+    aliases = {
+        "counter": "count",
+        "countfail": "countfails",
+        "fails": "countfails",
+    }
+    lbtype = aliases.get(lbtype, lbtype)
+    if lbtype not in ["count", "cookies", "countfails"]:
+        leaderboard.reset_cooldown(ctx)  # refund cooldown for typos
+        return await ctx.reply(
+            "Invalid leaderboard type! Please use: `cookies`, `count`, `countfails`.",
+            delete_after=7
+        )
 
     guild_data = await bot.db.get_guild_users(ctx.guild.id)
     if guild_data is None:
@@ -44,7 +68,7 @@ async def leaderboard(ctx: commands.Context):
         return await ctx.reply("No users have cookies here!", delete_after=7)
 
     # ----- Build new Embed -----
-    embed = await build_embed(guild_users, str(ctx.author.id))
+    embed = await build_embed(guild_users, str(ctx.author.id), lbtype=lbtype)
     embed.set_thumbnail(url=ctx.guild.icon)
 
     # ----- Add Buttons -----
@@ -55,14 +79,14 @@ async def leaderboard(ctx: commands.Context):
         style=discord.ButtonStyle.secondary,
         label=UNICODE_LEFT,
         disabled=True,
-        custom_id=f"lb-button:{ctx.author.id}:0:{max_pages}",
+        custom_id=f"lb-button:{ctx.author.id}:{lbtype}:0:{max_pages}",
     )
 
     right_button = discord.ui.Button(
         style=discord.ButtonStyle.secondary,
         label=UNICODE_RIGHT,
         disabled=True if max_pages == 1 else False,
-        custom_id=f"lb-button:{ctx.author.id}:1:{max_pages}",
+        custom_id=f"lb-button:{ctx.author.id}:{lbtype}:1:{max_pages}",
     )
 
     view.add_item(left_button)
@@ -72,17 +96,26 @@ async def leaderboard(ctx: commands.Context):
 
 
 @leaderboard.error
-async def on_command_error(ctx: commands.Context, error: commands.CommandError):
+async def leaderboard_error(ctx: commands.Context, error: commands.CommandError):
+    # 1) cooldown error
     if isinstance(error, commands.CommandOnCooldown):
-        # send the cooldown embed
         timer = f"{error.retry_after:.0f}"
         cooldown_embed = discord.Embed(
-            description="You're on cooldown, please try again in ``" + timer + " seconds``.", color=0x992D22
+            description=f"You're on cooldown, please try again in ``{timer} seconds``.",
+            color=0x992D22
         )
+        return await ctx.send(embed=cooldown_embed)
 
-        await ctx.send(embed=cooldown_embed)
-    else:
-        await ctx.send(f"An unexpected error was encountered when running this command - {type(error)}")
+    # 2) parameter errors, doesn't cooldown
+    if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
+        return await ctx.send("Usage: `.lb <cookies|count|countfails>`")
+
+    # 3) real errors that caused cooldowns
+    leaderboard.reset_cooldown(ctx)
+
+    original = getattr(error, "original", error)
+    await ctx.send(f"Error: `{type(original).__name__}: {original}`")
+
 
 
 # Ref: https://github.com/One-Nub/helper-bot/blob/main/src/modules/auto_response/autoresponder.py
@@ -91,8 +124,9 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
     custom_id_data = interaction.data["custom_id"].split(":")  # type: ignore
     custom_id_data.pop(0)
     original_author_id = custom_id_data[0]
-    new_page_index = int(custom_id_data[1])
-    max_pages = int(custom_id_data[2])
+    lbtype = custom_id_data[1]
+    new_page_index = int(custom_id_data[2])
+    max_pages = int(custom_id_data[3])
 
     if not interaction.message or not interaction.guild:
         return
@@ -123,7 +157,7 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
     if not guild_users:
         return await interaction.response.send_message("No users have cookies here!", ephemeral=True)
 
-    embed = await build_embed(guild_users, str(interaction.user.id), page_num=new_page_index)
+    embed = await build_embed(guild_users, str(interaction.user.id), lbtype = lbtype, page_num=new_page_index)
     embed.set_thumbnail(url=interaction.guild.icon)
 
     # ----- Update buttons -----
@@ -135,14 +169,14 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
         style=discord.ButtonStyle.secondary,
         label=UNICODE_LEFT,
         disabled=True if prev_page_index <= 0 and new_page_index != 1 else False,
-        custom_id=f"lb-button:{interaction.user.id}:{prev_page_index}:{max_pages}",
+        custom_id=f"lb-button:{interaction.user.id}:{lbtype}:{prev_page_index}:{max_pages}",
     )
 
     right_button = discord.ui.Button(
         style=discord.ButtonStyle.secondary,
         label=UNICODE_RIGHT,
         disabled=True if next_page_index == max_pages else False,
-        custom_id=f"lb-button:{interaction.user.id}:{next_page_index}:{max_pages}",
+        custom_id=f"lb-button:{interaction.user.id}:{lbtype}:{next_page_index}:{max_pages}",
     )
 
     view.add_item(left_button)
@@ -151,10 +185,20 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
     await interaction.response.edit_message(embed=embed, view=view)
 
 
-async def build_embed(guild_users: dict, author_id: str, page_num: int = 0) -> discord.Embed:
-    simplified_users: list[SimpleUser] = [
-        SimpleUser(uid, data["Cookies"]) for uid, data in guild_users.items()
-    ]
+async def build_embed(guild_users: dict, author_id: str, lbtype: str, page_num: int = 0) -> discord.Embed:
+    if lbtype == "cookies":
+        simplified_users: list[SimpleUser] = [
+            SimpleUser(uid, data["Cookies"], lbtype=lbtype) for uid, data in guild_users.items()
+        ]
+    elif lbtype == "count":
+        simplified_users: list[SimpleUser] = [
+            SimpleUser(uid, data["Counter"], lbtype=lbtype) for uid, data in guild_users.items()
+        ]
+    elif lbtype =="countfails":
+        simplified_users: list[SimpleUser] = [
+            SimpleUser(uid, data["FailCounter"], lbtype=lbtype) for uid, data in guild_users.items()
+        ]
+
     simplified_users.sort(key=(lambda x: x.cookies), reverse=True)
 
     this_user = None
