@@ -3,7 +3,7 @@ import discord
 
 from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
 
-@bot.command(aliases = ["whoami", "myprofile"])
+@bot.command(aliases = ["whoami", "mystats"])
 async def profile(ctx, userID = '0'):
     try:
         ## set vars
@@ -36,7 +36,7 @@ async def profile(ctx, userID = '0'):
 
         ## build the embed
         stats_embed = discord.Embed(
-            title = str(user.display_name) + "'s Stats",
+            title = str(user.display_name) + "'s Profile",
             description = "Bio coming soon!",
             color = 0x7289da,
             )
