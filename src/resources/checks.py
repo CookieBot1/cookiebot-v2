@@ -95,6 +95,7 @@ async def new_counter(guildID):
         "Channel": 0,
         "Counter": 0,
         "lastUser": 0,
+        "highScore": 0,
         "AllowMath": True
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "counter": {**newGuild}}})
