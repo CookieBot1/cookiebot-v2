@@ -16,6 +16,39 @@ async def setcounter(ctx):
     await update_counter(guildID, "Counter", 0)
     await update_counter(guildID, "lastUser", 0)
 
+
+    # Ask the question once
+    prompt = await ctx.send(
+        "Enable math expressions in the counting channel? "
+        "(example: `1+1` counts as `2`)\n"
+        "Reply with `yes` or `no` within **30 seconds**."
+    )
+
+    def check(m: discord.Message) -> bool:
+        return (
+            m.author.id == ctx.author.id
+            and m.channel.id == ctx.channel.id
+            and m.guild is not None
+        )
+
+    allow_math = False
+    try:
+        reply: discord.Message = await bot.wait_for("message", timeout=30.0, check=check)
+        content = reply.content.strip().lower()
+
+        if content in ("yes", "y", "true", "on", "enable", "enabled"):
+            allow_math = True
+        elif content in ("no", "n", "false", "off", "disable", "disabled"):
+            allow_math = False
+        else:
+            # invalid response -> keep default (False)
+            await ctx.send("Didn’t understand that — leaving math expressions **disabled**.")
+    except TimeoutError:
+        await ctx.send("No response — leaving math expressions **disabled**.")
+
+    await update_counter(guildID, "AllowMath", allow_math)
+
+
     counter_embed = discord.Embed(
         title = "✅ Counter Channel Set!",
         description = "Want to change your counter channel? Run ``.setcounter`` again in that channel.",
