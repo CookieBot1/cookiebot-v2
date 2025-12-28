@@ -4,6 +4,61 @@ from resources.checks import lookup_counter, update_counter, update_value, looku
 from resources.mrcookie import instance as bot
 
 
+import ast
+import operator as op
+
+# Allowed operators
+_ALLOWED_OPS = {
+    ast.Add: op.add,
+    ast.Sub: op.sub,
+    ast.Mult: op.mul,
+    ast.Div: op.truediv,
+    ast.FloorDiv: op.floordiv,
+    ast.Mod: op.mod,
+    ast.Pow: op.pow,          # optional (you can remove if you don't want **)
+    ast.USub: op.neg,
+    ast.UAdd: op.pos,
+}
+
+def safe_eval_int(expr: str) -> int | None:
+    """
+    Safely evaluate a math expression and return an int if it is exactly an integer.
+    Returns None if invalid / not an integer.
+    """
+    expr = expr.strip().replace("×", "*").replace("÷", "/")
+
+    # quick reject of long spam
+    if len(expr) > 32:
+        return None
+
+    try:
+        node = ast.parse(expr, mode="eval").body
+    except SyntaxError:
+        return None
+
+    def _eval(n):
+        if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)):
+            return n.value
+        if isinstance(n, ast.Num):  # older AST nodes (safe)
+            return n.n
+        if isinstance(n, ast.BinOp) and type(n.op) in _ALLOWED_OPS:
+            return _ALLOWED_OPS[type(n.op)](_eval(n.left), _eval(n.right))
+        if isinstance(n, ast.UnaryOp) and type(n.op) in _ALLOWED_OPS:
+            return _ALLOWED_OPS[type(n.op)](_eval(n.operand))
+        raise ValueError("disallowed expression")
+
+    try:
+        value = _eval(node)
+    except Exception:
+        return None
+
+    # Only accept results that are mathematically integers (2.0 ok, 2.5 not ok)
+    if isinstance(value, float) and not value.is_integer():
+        return None
+
+    return int(value)
+
+
 @bot.listen()
 async def on_message(message: discord.Message):
     if message.guild is None or message.author.bot:
@@ -25,7 +80,22 @@ async def on_message(message: discord.Message):
     user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
     guildID = message.guild.id
     try:
-        if message.channel.id != channelID or not message.content.isdigit():
+        allow_math = counterData["settings"]["counter"]["AllowMath"]
+
+        if message.channel.id != channelID:
+            return
+
+        raw = message.content.strip()
+
+        # always accept normal numbers
+        parsed = int(raw) if raw.isdigit() else None
+
+        # optionally accept calculator expressions
+        allow_math = counterData["settings"]["counter"].get("AllowMath", False)
+        if parsed is None and allow_math:
+            parsed = safe_eval_int(raw)
+
+        if parsed is None:
             return
 
         ## setting vars
@@ -38,9 +108,9 @@ async def on_message(message: discord.Message):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
 
-        if int(message.content) == savedCounter + 1:
+        if parsed == savedCounter + 1:
             if userID != lastUser:
-                savedCounter = int(message.content)
+                savedCounter = parsed
                 userCounter += 1
                 await update_counter(guildID, "Counter", savedCounter)
                 await update_counter(guildID, "lastUser", userID)
