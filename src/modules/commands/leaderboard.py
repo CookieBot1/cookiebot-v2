@@ -69,7 +69,7 @@ async def leaderboard(ctx: commands.Context, lbtype: str = "cookies"):
 
     # ----- Build new Embed -----
     embed = await build_embed(guild_users, str(ctx.author.id), lbtype=lbtype)
-    embed.set_thumbnail(url=ctx.guild.icon)
+    embed.set_thumbnail(url=ctx.guild.icon.url)
 
     # ----- Add Buttons -----
     max_pages = math.ceil(len(guild_users) / MAX_USERS_PER_PAGE)
@@ -108,6 +108,7 @@ async def leaderboard_error(ctx: commands.Context, error: commands.CommandError)
 
     # 2) parameter errors, doesn't cooldown
     if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
+        leaderboard.reset_cooldown(ctx)
         return await ctx.send("Usage: `.lb <cookies|count|countfails>`")
 
     # 3) real errors that caused cooldowns
@@ -158,7 +159,7 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
         return await interaction.response.send_message("No users have cookies here!", ephemeral=True)
 
     embed = await build_embed(guild_users, str(interaction.user.id), lbtype = lbtype, page_num=new_page_index)
-    embed.set_thumbnail(url=interaction.guild.icon)
+    embed.set_thumbnail(url=interaction.guild.icon.url)
 
     # ----- Update buttons -----
     prev_page_index = 0 if new_page_index - 1 < 0 else new_page_index - 1
