@@ -39,11 +39,7 @@ async def balance(ctx, userID = '0'):
             )
     
         stats_embed.add_field(name = "Cookies", value = userCookies, inline = True)
-        if userStreaks == 1:
-            dayTerm = "Day"
-        else:
-            dayTerm = "Days"
-        stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
+        stats_embed.add_field(name = "Rank", value = "WIP", inline = True)
         if userDailyMultiplier != 0:
             stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
 
