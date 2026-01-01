@@ -1,7 +1,25 @@
 from resources.mrcookie import instance as bot
 import discord
+from typing import Optional
+from attrs import define, field
 
 from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
+
+@define()
+class SimpleUser:
+    uid: str
+    cookies: int
+    position: Optional[int] = field(default=0, kw_only=True)
+
+    async def lb_output(self) -> str:
+        user = bot.get_user(int(self.uid)) or await bot.fetch_user(int(self.uid))
+        if user.global_name == None: lb_user = user.name
+        else: lb_user = user.global_name
+
+        return (
+        f"**#{self.position}. {lb_user}**"
+        f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
+        )
 
 @bot.command(aliases = ["whoami", "mystats"])
 async def profile(ctx, userID = '0'):
@@ -34,6 +52,22 @@ async def profile(ctx, userID = '0'):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
 
+        ## get user ranking by cookies (from leaderboard)
+        guild_users: dict = userData.get("users", {})
+    
+        simplified_users: list[SimpleUser] = [
+            SimpleUser(uid, data["Cookies"]) for uid, data in guild_users.items()
+        ]
+        simplified_users.sort(key=(lambda x: x.cookies), reverse=True)
+
+        this_user = None
+        for n, su in enumerate(simplified_users):
+            su.position = n + 1
+            if su.uid == str(userID):
+                this_user = su
+
+
+
         ## build the embed
         stats_embed = discord.Embed(
             title = str(user.display_name) + "'s Profile",
@@ -49,13 +83,16 @@ async def profile(ctx, userID = '0'):
         stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
         if userDailyMultiplier != 0:
             stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
-        stats_embed.add_field(name = "Rank", value = "WIP", inline = True)
+
+        rank_value = this_user.position if this_user else "Unranked"
+        stats_embed.add_field(name = "Rank", value = rank_value, inline = True)
+        
         stats_embed.add_field(name = "Num's Counted", value = str(userCounter) + " Numbers", inline = True)
         stats_embed.add_field(name = "Count Fails", value = str(userFailCounter) + " Fails", inline = True)
         stats_embed.add_field(name = "Count Saves", value = "WIP", inline = True)
 
         stats_embed.set_thumbnail(url = user.display_avatar)
-        stats_embed.set_footer(text = "Want to customize this? (coming soon)")
+        stats_embed.set_footer(text = "Customization coming soon!")
         
         await ctx.send(embed=stats_embed)
     
