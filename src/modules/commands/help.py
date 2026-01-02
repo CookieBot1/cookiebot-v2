@@ -16,11 +16,13 @@ async def help(ctx, category = "general"):
             "count": "counter",
             "counting": "counter",
             "cookie": "cookies",
+            "statistics": "stats",
+            "stat": "stats",
         }
         category = aliases.get(category, category)
-        if category not in ["general", "info", "settings", "counter", "cookies"]:
+        if category not in ["general", "info", "settings", "counter", "cookies", "stats"]:
             return await ctx.reply(
-                "Invalid help type! Please use: `general`, `info`, `settings`, `counter`, `cookies`.",
+                "Invalid help type! Please use: `general`, `info`, `settings`, `counter`, `cookies`, `stats`.",
                 delete_after=7
             )
 
@@ -43,12 +45,16 @@ async def help(ctx, category = "general"):
             "``.settings`` ``.ignoredrops`` ``.configcounter`` ``.setcounterchannel`` ``.resetcounter`` ", inline = False)
             
             help_embed.add_field(name = "✏️ Counter", value =
-            "Commands to manage the counting game in your server." + "\n" +
-            "``.leaderboard count`` ``.leaderboard countfails`` ``.savecount``", inline = False)
+            "All the commands involving the counting game!" + "\n" +
+            "``.savecount`` ``.skipcount``", inline = False)
             
             help_embed.add_field(name = "🍪 Cookies", value =
             "All the fun commands involving cookies!" + "\n" +
-            "``.daily`` ``.rob`` ``.give`` ``.eat`` ``.balance`` ``.leaderboard cookies`` ``.shop``", inline = False)
+            "``.daily`` ``.rob`` ``.give`` ``.eat`` ``.shop``", inline = False)
+
+            help_embed.add_field(name = "📈 Stats", value =
+            "View various statistics about your server and users!" + "\n" +
+            "``.profile`` ``.stats`` ``.leaderboard`` ``.balance``", inline = False)
 
             help_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=help_embed)
@@ -64,6 +70,9 @@ async def help(ctx, category = "general"):
 
         if category == "cookies":
             await ctx.send("Cookies section WIP")
+
+        if category == "stats":
+            await ctx.send("Stats section WIP")
 
 
         '''"``.help``➙ View this help page to learn about CookieBot." + "\n" +
