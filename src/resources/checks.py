@@ -36,7 +36,7 @@ async def lookup_database(userID, guildID):
     else:
         return False
     
-## REMOVE!!!!!!!!!
+## REMOVE AFTER COOKIE TRANSFERS - this looks at OLD DB!!!!!!!!!
 async def lookup_old_database(userID, guildID):
     data = await bot.db.find_old_user({"_id": str(guildID), f"users.{userID}": {"$exists": True}})
     if data != None:
