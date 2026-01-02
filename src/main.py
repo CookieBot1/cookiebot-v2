@@ -32,6 +32,7 @@ async def main():
     )
 
     MODULES = ["modules/commands", "modules/events", "modules/commands/drops", "modules/commands/counter"]
+    bot.remove_command('help') # remove the default help command
 
     ## loop through all the files under the commands folder, that's how we check for commands
     for directory in MODULES:
