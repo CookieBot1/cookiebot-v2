@@ -16,6 +16,7 @@ There is a beta version of the bot with experimental features, it is available o
 ### Invite
 
 Try out CookieBot by clicking the invite [here]().
+(Currently closed for beta testing)
 
 
 
