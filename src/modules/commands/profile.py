@@ -104,7 +104,7 @@ async def profile(ctx, userID = '0'):
         stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
         stats_embed.add_field(
             name="Rob Chances",
-            value=f"{userRobChances * 10:.0f}%",
+            value=f"{100-(userRobChances * 10):.0f}%",
             inline=True
         )
 
