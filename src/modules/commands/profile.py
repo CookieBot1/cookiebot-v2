@@ -55,15 +55,12 @@ async def profile(ctx, userID = '0'):
 
         ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
         userThing = userData["users"].get(userID, {})
+
         rob_count = userThing.get("RobCount")
         rob_gains = userThing.get("RobGains")
 
-        if rob_count is None or rob_gains is None:
-            userRobCount = 0
-            userRobGains = 0
-        else:
-            userRobCount = rob_count
-            userRobGains = rob_gains
+        userRobCount = 0 if rob_count is None else int(rob_count)
+        userRobGains = 0 if rob_gains is None else int(rob_gains)
         ## ------------------------------------------------------------
 
         ## get user ranking by cookies (from leaderboard)
@@ -105,7 +102,11 @@ async def profile(ctx, userID = '0'):
 
         stats_embed.add_field(name = "Rob Count", value = f"{userRobCount} Robber{'ies' if userRobCount != 1 else 'y'}", inline = True)
         stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
-        stats_embed.add_field(name = "Rob Chances", value = str((int(userRobChances)/10) * 100) + "%", inline = True)
+        stats_embed.add_field(
+            name="Rob Chances",
+            value=f"{userRobChances * 10:.0f}%",
+            inline=True
+        )
 
         stats_embed.set_thumbnail(url=member.display_avatar.url)
         stats_embed.set_footer(text = "Customization coming soon!")
