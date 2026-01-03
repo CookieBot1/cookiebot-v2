@@ -54,9 +54,9 @@ async def profile(ctx, userID = '0'):
         userRobChances = userData["users"][userID]["RobChances"]
 
         ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
-        user = userData["users"].get(userID, {})
-        rob_count = user.get("RobCount")
-        rob_gains = user.get("RobGains")
+        userThing = userData["users"].get(userID, {})
+        rob_count = userThing.get("RobCount")
+        rob_gains = userThing.get("RobGains")
 
         if rob_count is None or rob_gains is None:
             userRobCount = 0
