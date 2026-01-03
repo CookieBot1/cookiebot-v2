@@ -37,7 +37,7 @@ async def profile(ctx, userID = '0'):
             userID = ctx.author.id
         
         ## set vars
-        user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+        member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
         
         ## this block fetches their data from the database
         userData = await lookup_database(userID, guildID) 
@@ -84,7 +84,7 @@ async def profile(ctx, userID = '0'):
 
         ## build the embed
         stats_embed = discord.Embed(
-            title = str(user.display_name) + "'s Profile",
+            title = f"{member.display_name}'s Profile",
             description = "Bio coming soon!",
             color = 0x7289da,
             )
@@ -107,7 +107,7 @@ async def profile(ctx, userID = '0'):
         stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
         stats_embed.add_field(name = "Rob Chances", value = str((int(userRobChances)/10) * 100) + "%", inline = True)
 
-        stats_embed.set_thumbnail(url = user.display_avatar)
+        stats_embed.set_thumbnail(url=member.display_avatar.url)
         stats_embed.set_footer(text = "Customization coming soon!")
         
         await ctx.send(embed=stats_embed)
