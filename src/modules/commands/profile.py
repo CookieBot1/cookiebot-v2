@@ -94,7 +94,7 @@ async def profile(ctx, userID = '0'):
 
         stats_embed.add_field(name = "Rob Count", value = f"{userRobCount} Robber{'ies' if userRobCount != 1 else 'y'}", inline = True)
         stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
-        stats_embed.add_field(name = "Rob Chances", value = str((int(userRobChances)/10) * 100) + "% Chance", inline = True)
+        stats_embed.add_field(name = "Rob Chances", value = str((int(userRobChances)/10) * 100) + "%", inline = True)
 
         stats_embed.set_thumbnail(url = user.display_avatar)
         stats_embed.set_footer(text = "Customization coming soon!")
