@@ -51,6 +51,9 @@ async def profile(ctx, userID = '0'):
         userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
+        userRobCount = userData["users"][userID]["RobCount"]
+        userRobGains = userData["users"][userID]["RobGains"]
+        userRobChances = userData["users"][userID]["RobChances"]
 
         ## get user ranking by cookies (from leaderboard)
         guild_users: dict = userData.get("users", {})
@@ -76,10 +79,8 @@ async def profile(ctx, userID = '0'):
             )
     
         stats_embed.add_field(name = "Cookies", value = userCookies, inline = True)
-        if userStreaks == 1:
-            dayTerm = "Day"
-        else:
-            dayTerm = "Days"
+        if userStreaks == 1: dayTerm = "Day"
+        else: dayTerm = "Days"
         stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
         if userDailyMultiplier != 0:
             stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
@@ -90,6 +91,10 @@ async def profile(ctx, userID = '0'):
         stats_embed.add_field(name = "Num's Counted", value = str(userCounter) + " Numbers", inline = True)
         stats_embed.add_field(name = "Count Fails", value = str(userFailCounter) + " Fails", inline = True)
         stats_embed.add_field(name = "Count Saves", value = "WIP", inline = True)
+
+        stats_embed.add_field(name = "Rob Count", value = f"{userRobCount} Robber{'ies' if userRobCount != 1 else 'y'}", inline = True)
+        stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
+        stats_embed.add_field(name = "Rob Chances", value = str((int(userRobChances)/10) * 100) + "% Chance", inline = True)
 
         stats_embed.set_thumbnail(url = user.display_avatar)
         stats_embed.set_footer(text = "Customization coming soon!")
