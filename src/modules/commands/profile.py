@@ -51,9 +51,20 @@ async def profile(ctx, userID = '0'):
         userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
-        userRobCount = userData["users"][userID]["RobCount"]
-        userRobGains = userData["users"][userID]["RobGains"]
         userRobChances = userData["users"][userID]["RobChances"]
+
+        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
+        user = userData["users"].get(userID, {})
+        rob_count = user.get("RobCount")
+        rob_gains = user.get("RobGains")
+
+        if rob_count is None or rob_gains is None:
+            userRobCount = 0
+            userRobGains = 0
+        else:
+            userRobCount = rob_count
+            userRobGains = rob_gains
+        ## ------------------------------------------------------------
 
         ## get user ranking by cookies (from leaderboard)
         guild_users: dict = userData.get("users", {})
