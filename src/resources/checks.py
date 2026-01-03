@@ -62,6 +62,7 @@ async def new_database(userID, guildID):
         "RobCount": 0,
         "RobGains": 0,
         "Counter": 0,
+        "CountSaves": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
         ##"UserSettings": [],
