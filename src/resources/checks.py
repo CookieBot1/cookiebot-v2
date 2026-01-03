@@ -36,6 +36,7 @@ async def lookup_database(userID, guildID):
     else:
         return False
     
+
 ## REMOVE AFTER COOKIE TRANSFERS - this looks at OLD DB!!!!!!!!!
 async def lookup_old_database(userID, guildID):
     data = await bot.db.find_old_user({"_id": str(guildID), f"users.{userID}": {"$exists": True}})
@@ -45,6 +46,7 @@ async def lookup_old_database(userID, guildID):
         return False
 async def update_old_database(userID, guildID, updated_dict):
     await bot.db.update_old_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**updated_dict}}})
+## -----------
 
 
 async def new_database(userID, guildID):
@@ -56,11 +58,13 @@ async def new_database(userID, guildID):
         "DailyMultExpire": datetime.now(),
         "RobExpire": datetime.now() - timedelta(hours=24),
         "RobChances": 7,  ## default rob chance, 70% failure
-        "RobExpire": datetime.now(),
         "RobProtection": datetime.now() - timedelta(hours=24),
+        "RobCount": 0,
+        "RobGains": 0,
         "Counter": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
+        ##"UserSettings": [],
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
