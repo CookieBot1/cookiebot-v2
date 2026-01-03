@@ -16,7 +16,7 @@ from resources.constants import EMBED_GREEN, EMBED_RED
 from resources.mrcookie import instance as bot
 
 
-@bot.command(aliases=["steal"])
+@bot.command(aliases=["steal", "mug"])
 async def rob(ctx, userID="0"):
     try:
         guild_id = ctx.guild.id
@@ -81,6 +81,19 @@ async def rob(ctx, userID="0"):
         user_rob_prot = user_data["users"][userID]["RobProtection"]
         user_rob_chances = user_data["users"][userID]["RobChances"]  # likelihood target user is to be robbed
 
+        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
+        user = user_data["users"].get(userID, {})
+        rob_count = user.get("RobCount")
+        rob_gains = user.get("RobGains")
+
+        if rob_count is None or rob_gains is None:
+            user_rob_count = 0
+            user_rob_gains = 0
+        else:
+            user_rob_count = rob_count
+            user_rob_gains = rob_gains
+        ## ------------------------------------------------------------
+
         ## user checks
         if user_cookies < 15:
             raise Exception(
@@ -95,6 +108,9 @@ async def rob(ctx, userID="0"):
         embed_title = None
         embed_desc = None
         embed_color = None
+
+        ## update user rob stats
+        user_rob_count += 1
 
         if random_num > user_rob_chances:
             # success
@@ -121,6 +137,9 @@ async def rob(ctx, userID="0"):
                 RobChances=urc if (urc := user_rob_chances + 0.2) < 11 else 11,
             )
             await update_value(sender_id, guild_id, "Cookies", sender_cookies + stolen_cookies)
+            user_rob_gains += stolen_cookies
+            await update_value(sender_id, guild_id, "RobGains", user_rob_gains)
+
         else:
             # fail
             embed_title = "🚓 Robbery Fumbled"
@@ -154,6 +173,7 @@ async def rob(ctx, userID="0"):
 
         cooldown = datetime.now() + timedelta(hours=4)
         await update_value(sender_id, guild_id, "RobExpire", cooldown)
+        await update_value(sender_id, guild_id, "RobCount", user_rob_count)
 
         embed = discord.Embed(color=embed_color, description=embed_desc)
         embed.set_author(name=embed_title, icon_url=sender.display_avatar)
