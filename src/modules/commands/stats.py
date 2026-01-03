@@ -1,7 +1,7 @@
 from resources.mrcookie import instance as bot
 import discord
 
-from resources.checks import lookup_counter, lookup_server
+from resources.checks import lookup_counter, lookup_server, new_counter
 from typing import Optional
 from attrs import define, field
 
