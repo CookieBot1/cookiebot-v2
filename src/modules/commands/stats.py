@@ -27,7 +27,7 @@ async def stats(ctx):
         ## figure out who's #1 in each category
         guild_users: dict = userData.get("users", {})
 
-        stats = ["Cookies", "RobCount", "RobGains"]
+        stats = ["Cookies", "RobCount", "RobGains", "Counter"]
         leaders = {}
         for stat in stats:
             if not guild_users:
@@ -47,32 +47,41 @@ async def stats(ctx):
 
         stats_embed.add_field(name = "🧮 Highest Number Counted", value = "Server Record: **" + str(highScore) + "**", inline = False)
 
-        # Ranking stuff
+        # Ranking stuff for Numbers Counted
+        count_uid, count_val = leaders["Counter"]
+        if count_uid is None:
+            count_name = "Insufficient Data"
+        else:
+            user = bot.get_user(int(count_uid)) or await bot.fetch_user(int(count_uid))
+            count_name = user.global_name or user.name
+        stats_embed.add_field(name = "🧐 Most Numbers Counted", value = f"**{count_name}** has counted **{count_val}** time{'s' if count_val != 1 else ''}", inline = False)
+
+        # Ranking stuff for Cookies
         top_uid, top_cookies = leaders["Cookies"]
         if top_uid is None:
             top_name = "Insufficient Data"
         else:
             user = bot.get_user(int(top_uid)) or await bot.fetch_user(int(top_uid))
             top_name = user.global_name or user.name
-        stats_embed.add_field(name = "🍪 Richest In Cookies", value = f"**{top_name}** has **{top_cookies}** Cookie{'s' if top_cookies != 1 else ''}", inline = False)
+        stats_embed.add_field(name = "🍪 Richest In Cookies", value = f"**{top_name}** has **{top_cookies}** cookie{'s' if top_cookies != 1 else ''}", inline = False)
 
-        # Ranking stuff
+        # Ranking stuff for RobCount
         rob_uid, rob_val = leaders["RobCount"]
         if rob_uid is None:
             rob_name = "Insufficient Data"
         else:
             user = bot.get_user(int(rob_uid)) or await bot.fetch_user(int(rob_uid))
             rob_name = user.global_name or user.name
-        stats_embed.add_field(name = "🎭 Most Notorious Criminal", value = f"**{rob_name}** committed **{rob_val}** Robber{'ies' if rob_val != 1 else 'y'}", inline = False)
+        stats_embed.add_field(name = "🎭 Most Notorious Criminal", value = f"**{rob_name}** committed **{rob_val}** robber{'ies' if rob_val != 1 else 'y'}", inline = False)
 
-        # Ranking stuff
+        # Ranking stuff for RobGains
         rich_rob_uid, rich_rob_val = leaders["RobGains"]
         if rich_rob_uid is None:
             rich_rob_name = "Insufficient Data"
         else:
             user = bot.get_user(int(rich_rob_uid)) or await bot.fetch_user(int(rich_rob_uid))
             rich_rob_name = user.global_name or user.name
-        stats_embed.add_field(name = "💰 Richest Thief", value = f"**{rich_rob_name}** stole **{rich_rob_val}** Cookie{'s' if rich_rob_val != 1 else ''}", inline = False)
+        stats_embed.add_field(name = "💰 Richest Thief", value = f"**{rich_rob_name}** stole **{rich_rob_val}** cookie{'s' if rich_rob_val != 1 else ''}", inline = False)
 
         stats_embed.set_thumbnail(url = guild.icon.url)
 
