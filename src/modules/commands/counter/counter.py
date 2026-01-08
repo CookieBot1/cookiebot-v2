@@ -1,13 +1,9 @@
 import discord
-
 from resources.checks import lookup_counter, update_counter, update_value, lookup_database, new_database
 from resources.mrcookie import instance as bot
-
-
 import ast
 import operator as op
 
-# Allowed operators
 _ALLOWED_OPS = {
     ast.Add: op.add,
     ast.Sub: op.sub,
@@ -15,16 +11,13 @@ _ALLOWED_OPS = {
     ast.Div: op.truediv,
     ast.FloorDiv: op.floordiv,
     ast.Mod: op.mod,
-    ast.Pow: op.pow,          # optional (you can remove if you don't want **)
+    ast.Pow: op.pow,
     ast.USub: op.neg,
     ast.UAdd: op.pos,
 }
 
 def safe_eval_int(expr: str) -> int | None:
-    """
-    Safely evaluate a math expression and return an int if it is exactly an integer.
-    Returns None if invalid / not an integer.
-    """
+    '''Safely evaluate a math expression and return an int if it is exactly an integer. Returns None if invalid / not an integer.'''
     expr = expr.strip().replace("×", "*").replace("÷", "/")
 
     # quick reject of long spam
@@ -39,7 +32,7 @@ def safe_eval_int(expr: str) -> int | None:
     def _eval(n):
         if isinstance(n, ast.Constant) and isinstance(n.value, (int, float)):
             return n.value
-        if isinstance(n, ast.Num):  # older AST nodes (safe)
+        if isinstance(n, ast.Num): 
             return n.n
         if isinstance(n, ast.BinOp) and type(n.op) in _ALLOWED_OPS:
             return _ALLOWED_OPS[type(n.op)](_eval(n.left), _eval(n.right))
@@ -52,7 +45,7 @@ def safe_eval_int(expr: str) -> int | None:
     except Exception:
         return None
 
-    # Only accept results that are mathematically integers (2.0 ok, 2.5 not ok)
+    # only accept results that are mathematically integers (2.0 ok, 2.5 not ok)
     if isinstance(value, float) and not value.is_integer():
         return None
 
