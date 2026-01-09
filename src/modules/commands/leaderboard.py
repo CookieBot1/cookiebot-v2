@@ -50,6 +50,7 @@ async def leaderboard(ctx: commands.Context, lbtype: str = "cookies"):
         "counter": "count",
         "countfail": "countfails",
         "fails": "countfails",
+        "failcount:": "countfails",
     }
     lbtype = aliases.get(lbtype, lbtype)
     if lbtype not in ["count", "cookies", "countfails"]:
