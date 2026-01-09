@@ -152,7 +152,7 @@ async def rob(ctx, userID="0"):
             )  # remove cookies from sender
 
             # TODO: Put in fun fail messages
-            embed_desc = "SCRAM, IT'S THE COPS  - u failed. SO you lost "
+            embed_desc = f"Mission FAILED! <@{userID}> got lucky.. so you lost "
 
             gift_chance = random.randint(1, 10)
             if gift_chance <= 2:
