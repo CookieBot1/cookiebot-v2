@@ -6,6 +6,12 @@ import discord
 async def setcounter(ctx):
     guildID = ctx.guild.id
 
+    if ctx.guild is None:
+        return await ctx.message.reply(content="This commands only works in servers!", delete_after=5)
+
+    if not ctx.author.guild_permissions.manage_guild:
+        return await ctx.message.reply(content="You can't use this command.", delete_after=5)
+
     counterData = await lookup_counter(guildID)
     if counterData is False:
         await new_counter(guildID)
