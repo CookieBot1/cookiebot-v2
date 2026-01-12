@@ -8,6 +8,12 @@ async def resetcounter(ctx):
     counterData = await lookup_counter(ctx.guild.id)
     channelID = counterData["settings"]["counter"]["Channel"]
 
+    if ctx.guild is None:
+        return await ctx.message.reply(content="This commands only works in servers!", delete_after=5)
+
+    if not ctx.author.guild_permissions.manage_guild:
+        return await ctx.message.reply(content="You can't use this command.", delete_after=5)
+
     if channelID == 0:
         counter_embed = discord.Embed(
             title = "😵‍💫 Nothing To Reset!",
