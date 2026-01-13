@@ -37,10 +37,15 @@ async def settings(ctx, category = "general"):
             "Assign Counter Role Every: **WIP**" + "\n"
             ,inline = False)
 
-            ##ID_list = "<#, <#".join(counterData["settings"]["server"]["IgnoredChannelDrops"])
-            ##settings_embed.add_field(name = "🍪 Cookies", value = 
-            ##"Ignored Drop Channels: " + str(ID_list) + "\n"
-            ##,inline = False)
+            ignored = counterData["settings"]["server"].get("IgnoredChannelDrops", [])
+            if not ignored:
+                ID_list = "No Channels Set"
+            else:
+                ID_list = ", ".join(f"<#{int(ch_id)}>" for ch_id in ignored)
+
+            settings_embed.add_field(name = "🍪 Cookies", 
+            value = "Ignored Drop Channels: " + str(ID_list) + "\n",
+            inline = False)
 
             settings_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=settings_embed)
