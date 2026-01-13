@@ -101,7 +101,10 @@ async def new_counter(guildID):
         "Counter": 0,
         "lastUser": 0,
         "highScore": 0,
-        "AllowMath": True
+        "AllowMath": True,
+        "badCounterRole": 0,
+        "roleUponDelete": False,
+        "roleUponFail": False
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "counter": {**newGuild}}})
 
