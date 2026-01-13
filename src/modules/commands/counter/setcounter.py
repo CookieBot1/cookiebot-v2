@@ -1,6 +1,10 @@
 from resources.mrcookie import instance as bot
 from resources.checks import update_counter, lookup_counter, new_counter
 import discord
+from discord.ext import commands
+
+YES = {"yes", "y", "true", "on", "enable", "enabled"}
+NO  = {"no", "n", "false", "off", "disable", "disabled"}
 
 @bot.command()
 async def setcounter(ctx):
