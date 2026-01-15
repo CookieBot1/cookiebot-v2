@@ -3,6 +3,7 @@ from resources.mrcookie import instance as bot
 import discord
 
 from resources.checks import lookup_counter
+from modules.commands.counter.counter import safe_eval_int
 
 
 @bot.event
