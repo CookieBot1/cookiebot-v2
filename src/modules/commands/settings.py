@@ -30,11 +30,26 @@ async def settings(ctx, category = "general"):
             # title and profile icon
             settings_embed.set_author(name = ctx.guild.name + " Settings Page", icon_url = ctx.guild.icon.url)
 
+            if str(counterData["settings"]["counter"]["Channel"]) == "0":
+                counter_channel = "**Not Set**"
+            else:
+                counter_channel = "<#" + str(counterData["settings"]["counter"]["Channel"]) + ">"
+
+            if str(counterData["settings"]["counter"]["badCounterRoleID"]) == 0:
+                bad_role = "**Not Set**"
+            else:
+                bad_role = "<@&" + str(counterData["settings"]["counter"]["badCounterRoleID"]) + ">"
+
+            if str(counterData["settings"]["counter"]["badCounterRoleFails"]) == 0:
+                bad_role_fails = "**Not Set**"
+            else:
+                bad_role_fails = "**" + str(counterData["settings"]["counter"]["badCounterRoleFails"]) + "**"            
+
             settings_embed.add_field(name = "💯 Counter", value = 
-            "Counter Channel: <#" + str(counterData["settings"]["counter"]["Channel"]) + ">" + "\n" +
+            "Counter Channel: " + counter_channel + "\n" +
+            "Bad Counter Role: " + bad_role + "\n" +
             "Allow Math: **" + str(counterData["settings"]["counter"]["AllowMath"]) + "**\n" +
-            "Bad Counter Role: **WIP**" + "\n" +
-            "Assign Counter Role Every: **WIP**" + "\n"
+            "Assign Bad Counter Role Every: " + bad_role_fails + " fails"
             ,inline = False)
 
             ignored = counterData["settings"]["server"].get("IgnoredChannelDrops", [])
