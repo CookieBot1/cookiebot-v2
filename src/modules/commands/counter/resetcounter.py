@@ -27,6 +27,8 @@ async def resetcounter(ctx):
         await update_counter(guildID, "Channel", 0)
         await update_counter(guildID, "Counter", 0)
         await update_counter(guildID, "lastUser", 0)
+        await update_counter(guildID, "AllowMath", False)
+        await update_counter(guildID, "badCounterRoleEnabled", False)
 
         counter_embed = discord.Embed(
             title = "🧽 Counter Channel Cleared",
