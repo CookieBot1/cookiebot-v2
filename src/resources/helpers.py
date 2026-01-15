@@ -1,0 +1,81 @@
+import discord
+from discord.ext import commands
+from resources.mrcookie import instance as bot
+
+YES = {"yes", "y", "true", "on", "enable", "enabled"}
+NO  = {"no", "n", "false", "off", "disable", "disabled"}
+
+async def ask_yes_no(ctx, question: str, *, timeout: float = 30.0, default: bool = False, cleanup=None) -> bool:
+    qmsg = await ctx.send(question)
+    if cleanup is not None:
+        cleanup.append(qmsg)
+
+
+    def check(m: discord.Message) -> bool:
+        return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id and m.guild is not None
+
+    try:
+        msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
+        if cleanup is not None:
+            cleanup.append(msg)
+
+        content = msg.content.strip().lower()
+
+        if content in YES:
+            return True
+        if content in NO:
+            return False
+
+        await ctx.send(f"Invalid response - Using default: **{default}**.")
+        return default
+
+    except TimeoutError:
+        await ctx.send(f"No response — using default: **{default}**.")
+        return default
+
+
+async def ask_role(ctx, question: str, *, timeout: float = 45.0, cleanup=None):
+    qmsg = await ctx.send(question)
+    if cleanup is not None:
+        cleanup.append(qmsg)
+
+    def check(m: discord.Message) -> bool:
+        return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id and m.guild is not None
+
+    try:
+        msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
+        if cleanup is not None:
+            cleanup.append(msg)
+
+        ## mention
+        if msg.role_mentions:
+            return msg.role_mentions[0]
+
+        raw = msg.content.strip()
+
+        ## ID
+        if raw.isdigit():
+            role = ctx.guild.get_role(int(raw))
+            if role:
+                return role
+
+        ## name
+        role = discord.utils.get(ctx.guild.roles, name=raw)
+        if role:
+            return role
+
+        await ctx.send("Couldn’t find that role.")
+        return None
+
+    except TimeoutError:
+        await ctx.send("No response.")
+        return None
+
+def make_check(ctx):
+    def _check(m: discord.Message) -> bool:
+        return (
+            m.author.id == ctx.author.id
+            and m.channel.id == ctx.channel.id
+            and m.guild is not None
+        )
+    return _check
