@@ -3,6 +3,7 @@ ADMIN_USERS = (
     156872400145874944  # Nub
 )
 
+JUNO_ID = 764331038528634891  # Juno
 
 UNICODE_LEFT = "\u276e"  # left chevron, used for pagination
 UNICODE_RIGHT = "\u276f"  # right chevron, used for pagination
