@@ -106,6 +106,24 @@ async def on_message(message: discord.Message):
             if userID != lastUser:
                 savedCounter = parsed
                 userCounter += 1
+
+                userCookies = userData["users"][userID]["Cookies"]
+                if userCounter % 20 == 0:
+                    reward = min(10 + (userCounter // 600), 20)
+                    userCookies += reward
+
+                    await update_value(userID, guildID, "Cookies", userCookies)
+
+                    milestone_embed = discord.Embed(
+                        title="🎉 Counting Milestone!",
+                        description=(
+                            f"Congratulations {user.mention}! You have counted **{userCounter}** numbers correctly "
+                            f"and earned **{reward}** cookie{'s' if reward != 1 else ''}! 🍪"
+                        ),
+                        color=0x00ff00
+                    )
+                    await channel.send(embed=milestone_embed)
+
                 await update_counter(guildID, "Counter", savedCounter)
                 await update_counter(guildID, "lastUser", userID)
                 await update_value(userID, guildID, "Counter", userCounter)
