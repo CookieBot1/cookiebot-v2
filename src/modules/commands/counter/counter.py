@@ -109,7 +109,7 @@ async def on_message(message: discord.Message):
 
                 userCookies = userData["users"][userID]["Cookies"]
                 if userCounter % 20 == 0:
-                    reward = min(10 + (userCounter // 600), 20)
+                    reward = min(10 + (userCounter // 200), 20)
                     userCookies += reward
 
                     await update_value(userID, guildID, "Cookies", userCookies)
