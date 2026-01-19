@@ -96,7 +96,7 @@ async def profile(ctx, userID = '0'):
         rank_value = this_user.position if this_user else "Unranked"
         stats_embed.add_field(name = "Rank", value = rank_value, inline = True)
         
-        stats_embed.add_field(name = "Num's Counted", value = str(userCounter) + " Numbers", inline = True)
+        stats_embed.add_field(name = "Counter Stats", value = str(userCounter) + " Numbers", inline = True)
         stats_embed.add_field(name = "Count Fails", value = str(userFailCounter) + " Fails", inline = True)
         stats_embed.add_field(name = "Count Saves", value = "WIP", inline = True)
 
