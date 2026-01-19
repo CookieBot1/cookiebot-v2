@@ -49,7 +49,7 @@ async def settings(ctx, category = "general"):
             "Counter Channel: " + counter_channel + "\n" +
             "Bad Counter Role: " + bad_role + "\n" +
             "Allow Math: **" + str(counterData["settings"]["counter"]["AllowMath"]) + "**\n" +
-            "Assign Bad Counter Role Every: " + bad_role_fails + " fails"
+            "Assign Bad Counter Role Every: " + bad_role_fails + " **fails**"
             ,inline = False)
 
             ignored = counterData["settings"]["server"].get("IgnoredChannelDrops", [])
