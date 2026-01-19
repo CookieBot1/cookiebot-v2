@@ -1,5 +1,6 @@
 import discord
 from resources.checks import lookup_counter, update_counter, update_value, lookup_database, new_database
+from resources.constants import JUNO_ID
 from resources.mrcookie import instance as bot
 import ast
 import operator as op
@@ -101,6 +102,23 @@ async def on_message(message: discord.Message):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
         highScore = counterData["settings"]["counter"]["highScore"]
+
+        # Juno troll: block her counting attempts (without affecting others)
+        junomode = counterData["settings"]["server"]["juno"]
+        if not junomode:
+            return
+
+        if userID == str(JUNO_ID):
+            next_count = savedCounter + 1
+            troll = discord.Embed(
+                title="❌ WOAHHH WOAH THERE.. Counting REJECTED.",
+                description=f"You scammed ENOUGH ppl.. {user.mention}. Next count is still **{next_count}**. NO BUENO.",
+                color=0x992d22
+            )
+            troll.set_footer(text="Try again tho.. I think this is just one time only- 😈")
+            await channel.send(embed=troll)
+            await message.add_reaction("💀")
+            return
 
         if parsed == savedCounter + 1:
             if userID != lastUser:
