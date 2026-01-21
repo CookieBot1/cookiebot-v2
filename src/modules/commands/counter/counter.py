@@ -108,7 +108,7 @@ async def on_message(message: discord.Message):
         if not junomode:
             return
 
-        if userID == str(JUNO_ID):
+        if userID == JUNO_ID:
             next_count = savedCounter + 1
             troll = discord.Embed(
                 title="❌ WOAHHH WOAH THERE.. Counting REJECTED.",
