@@ -103,7 +103,7 @@ async def on_message(message: discord.Message):
         userFailCounter = userData["users"][userID]["FailCounter"]
         highScore = counterData["settings"]["counter"]["highScore"]
 
-        # Juno troll: block her counting attempts (without affecting others)
+        '''# Juno troll: block her counting attempts (without affecting others)
         junomode = counterData["settings"]["server"]["juno"]
         if not junomode:
             return
@@ -118,7 +118,7 @@ async def on_message(message: discord.Message):
             troll.set_footer(text="Try again tho.. I think this is just one time only- 😈")
             await channel.send(embed=troll)
             await message.add_reaction("💀")
-            return
+            return'''
 
         if parsed == savedCounter + 1:
             if userID != lastUser:
