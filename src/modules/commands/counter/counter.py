@@ -103,22 +103,9 @@ async def on_message(message: discord.Message):
         userFailCounter = userData["users"][userID]["FailCounter"]
         highScore = counterData["settings"]["counter"]["highScore"]
 
-        '''# Juno troll: block her counting attempts (without affecting others)
-        junomode = counterData["settings"]["server"]["juno"]
-        if not junomode:
-            return
-
+        ## juno troll- ignore this ty
         if userID == JUNO_ID:
-            next_count = savedCounter + 1
-            troll = discord.Embed(
-                title="❌ WOAHHH WOAH THERE.. Counting REJECTED.",
-                description=f"You scammed ENOUGH ppl.. {user.mention}. Next count is still **{next_count}**. NO BUENO.",
-                color=0x992d22
-            )
-            troll.set_footer(text="Try again tho.. I think this is just one time only- 😈")
-            await channel.send(embed=troll)
-            await message.add_reaction("💀")
-            return'''
+            await message.add_reaction("💅")
 
         if parsed == savedCounter + 1:
             if userID != lastUser:
