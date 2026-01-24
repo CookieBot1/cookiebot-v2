@@ -39,18 +39,18 @@ success_list = [
 ]
 
 fail_list = [
-    "trying to rob them but they called the cops on you",
-    "getting caught red handed by a security camera",
-    "tripping over your own feet and dropping all the cookies",
-    "accidentally robbing the cookie monster, and he was not happy",
-    "getting scared away by a loud bark from their dog",
-    "realizing you left your mask at home and getting recognized",
-    "slipping on a banana peel right before you could grab the cookies",
-    "getting lost on the way to their house",
-    "trying to pickpocket them but they felt your hand and yelled",
-    "getting distracted by a squirrel and forgetting what you were doing",
-    "accidentally robbing a police officer, and they arrested you",
-    "getting too close to cooldude and exploding.. **RIP**"
+    "trying to rob them.. so they called the cops on you 🫵😭",
+    "getting caught red handed by a security camera.. **loser**",
+    "tripping over your own feet and dropping all the cookies... *smooth move*",
+    "accidentally robbing the cookie monster, and he was not happy.. 👊",
+    "getting scared away by a loud bark from their dog 🐻‍❄️",
+    "realizing you left your mask at home and getting recognized, WHAT'S WRONG WITH U??",
+    "slipping on a banana peel right before you could grab the cookies- **classic.**",
+    "getting lost on the way to their house, that's what you get using Google Maps 😂",
+    "trying to pickpocket them but they felt your hand and cuffed you to` a lamp post :(",
+    "getting distracted by a squirrel and.. *checks notes*- **you CHASED IT**??",
+    "accidentally robbing a police officer.. so they planted stuff in your car.. **RIP**",
+    "getting too close to cooldude and exploding.. **NOOOOO**"
 ]
 
 gifted_fail_list = [
