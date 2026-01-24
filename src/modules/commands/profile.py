@@ -79,8 +79,8 @@ async def profile(ctx, userID = '0'):
                 this_user = su
 
 
-        if userID == JUNO_ID: desc = "Haay Slayerzzz, I'm Juno! Welcoom to mah profile ig uwu 👑✨",
-        else: desc = "Bio coming soon!",
+        if str(userID) == str(JUNO_ID): desc = "Haay Slayerzzz, I'm Juno! Welcoom to mah profile ig uwu 👑✨"
+        else: desc = "Bio coming soon!"
 
         ## build the embed
         stats_embed = discord.Embed(
