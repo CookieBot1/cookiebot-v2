@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import discord
 
-from modules.commands.robbing.messages import success_list
+from modules.commands.robbing.messages import success_list, fail_list, gifted_fail_list, juno_fail_list
 from resources.checks import (
     is_blacklisted,
     lookup_database,
@@ -12,7 +12,7 @@ from resources.checks import (
     update_value,
     validate_user,
 )
-from resources.constants import EMBED_GREEN, EMBED_RED
+from resources.constants import EMBED_GREEN, EMBED_RED, JUNO_ID
 from resources.mrcookie import instance as bot
 
 
@@ -151,16 +151,25 @@ async def rob(ctx, userID="0"):
                 sender_id, guild_id, "Cookies", sender_cookies - lost_cookies
             )  # remove cookies from sender
 
-            # TODO: Put in fun fail messages
-            embed_desc = f"Mission FAILED! <@{userID}> got lucky.. so you lost "
+            fail_msg = fail_list[random.choice(range(0, len(fail_list)))]
+            gifted_fail_msg = gifted_fail_list[random.choice(range(0, len(gifted_fail_list)))]
 
+            # fail embed
+            embed_desc = f"Mission FAILED! <@{userID}> got lucky.."
+
+            ## if gift chance succeeds, the robbed gets the lost cookies
             gift_chance = random.randint(1, 10)
             if gift_chance <= 2:
                 user_cookies += lost_cookies
-                embed_desc += f"`{lost_cookies}` cookies and YOUR TARGET BLACKMAILED YOU FOR THEM INSTEAD."
+                embed_desc += f" and gained YOUR '{lost_cookies}' cookies because {gifted_fail_msg}!"
+            ## else, the lost cookies are gone forever
             else:
+                ## check if juno ID
+                if userID == JUNO_ID:
+                    fail_msg = juno_fail_list[random.choice(range(0, len(juno_fail_list)))]
+
                 embed_desc += (
-                    f"`{lost_cookies}` cookies AND your cookies became stale, losing their value forever."
+                    f" and you lost '{lost_cookies}' cookies by {fail_msg}!"
                 )
 
             # Make it easier to rob user until we reach the base count again
