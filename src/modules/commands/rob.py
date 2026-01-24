@@ -126,7 +126,7 @@ async def rob(ctx, userID="0"):
                     stolen_cookies += int(user_cookies * 0.008)  # Additional 0.8%
 
             embed_title = "🥷 Robbery Successful!"
-            embed_desc = f"Mission Accomplished. You stole ``{stolen_cookies}`` of their (<@{userID}>) cookies by {success_msg}!"
+            embed_desc = f"Mission Accomplished. You stole ``{stolen_cookies}`` of <@{userID}>'s cookies by {success_msg}!"
             embed_color = EMBED_GREEN
 
             # Make it more difficult to rob the user again + remove cookies
