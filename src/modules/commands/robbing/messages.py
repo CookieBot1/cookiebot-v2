@@ -37,3 +37,45 @@ success_list = [
 "charging them your friend fee's, life isn't free!",
 "chasing them like a crazy person.. what is wrong with you?"
 ]
+
+fail_list = [
+    "trying to rob them but they called the cops on you",
+    "getting caught red handed by a security camera",
+    "tripping over your own feet and dropping all the cookies",
+    "accidentally robbing the cookie monster, and he was not happy",
+    "getting scared away by a loud bark from their dog",
+    "realizing you left your mask at home and getting recognized",
+    "slipping on a banana peel right before you could grab the cookies",
+    "getting lost on the way to their house",
+    "trying to pickpocket them but they felt your hand and yelled",
+    "getting distracted by a squirrel and forgetting what you were doing",
+    "accidentally robbing a police officer, and they arrested you",
+    "getting too close to cooldude and exploding.. **RIP**"
+]
+
+gifted_fail_list = [
+    "they set a trap for you and you fell for it like a noob",
+    "they were prepared and had a pan ready",
+    "they called their friends and you got surrounded.. LOL imagine",
+    "they were secretly training for robberies and outmatched you",
+    "they had a guard dog that scared you away.. kinda embarrassing ngl",
+    "they pretended to be asleep but were actually awake the whole time",
+    "they had a hidden alarm system that alerted the neighbors.. who happened to be ICE",
+    "they were a ninja in disguise and you cried and ran away",
+    "they had a secret weapon.. a water gun filled with hot sauce.. NOT THE EYES!!"
+]
+
+juno_fail_list = [
+    "you wanted to take a pic with Diddy.. but then you slipped from all the baby oil..",
+    "you tried to rob Diddy but he challenged you to a dance off and you lost miserably",
+    "you wanted to be in David's next album.. 😭",
+    "you lowkey just tripped on a tiny pebble.. OFC YOU DID..",
+    "you were too short to reach the cookie jar.. 🫵😂",
+    "you got distracted by a butterfly mid-robbery and lost focus tbh",
+    "you were too busy fangirling over iron man, so you tripped and fell- worth it.",
+    "your robbery just didn't 💅 slay 💅 enough, sorry 🥺",
+    "you got kidnapped by the teletubbie cartel, they wanted their sun back 😂",
+    "you got deported by ICE, NGL we all knew it was gonna happen someday 😂",
+    "I ran out of ideas and I think you just lowkenuinely blew up or smthing idk",
+    "you sang.. in the back of my MIND- you diedd.. then said this song is an inspiration to u 😇"
+]
