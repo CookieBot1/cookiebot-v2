@@ -4,6 +4,7 @@ from typing import Optional
 from attrs import define, field
 
 from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
+from resources.constants import JUNO_ID
 
 @define()
 class SimpleUser:
@@ -78,11 +79,13 @@ async def profile(ctx, userID = '0'):
                 this_user = su
 
 
+        if userID == JUNO_ID: desc = "Haay Slayerzzz, I'm Juno! Welcoom to mah profile ig uwu 👑✨",
+        else: desc = "Bio coming soon!",
 
         ## build the embed
         stats_embed = discord.Embed(
             title = f"{member.display_name}'s Profile",
-            description = "Bio coming soon!",
+            description = desc,
             color = 0x7289da,
             )
     
