@@ -104,7 +104,7 @@ async def on_message(message: discord.Message):
         highScore = counterData["settings"]["counter"]["highScore"]
 
         ## juno troll- ignore this ty
-        if userID == JUNO_ID:
+        if str(userID) == str(JUNO_ID):
             await message.add_reaction("💅")
 
         if parsed == savedCounter + 1:
