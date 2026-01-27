@@ -165,7 +165,7 @@ async def rob(ctx, userID="0"):
             ## else, the lost cookies are gone forever
             else:
                 ## check if juno ID
-                if str(userID) == str(JUNO_ID):
+                if str(sender_id) == str(JUNO_ID):
                     fail_msg = juno_fail_list[random.choice(range(0, len(juno_fail_list)))]
 
                 embed_desc += (
