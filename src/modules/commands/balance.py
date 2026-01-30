@@ -50,6 +50,7 @@ async def balance(ctx, userID = '0'):
         userStreaks = userData["users"][userID]["Streaks"]
         userCookies = userData["users"][userID]["Cookies"]
         userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
+        profileColor = userData["users"][userID]["ProfileColor"]
 
         guild_users: dict = userData.get("users", {})
     
@@ -67,7 +68,7 @@ async def balance(ctx, userID = '0'):
         ## send the embed
         bal_embed = discord.Embed(
             title = str(user.global_name) + "'s Cookie Balance",
-            color = 0x7289da,
+            color = profileColor,
             )
     
         bal_embed.add_field(name = "Cookies", value = userCookies, inline = True)
@@ -77,7 +78,7 @@ async def balance(ctx, userID = '0'):
         if userDailyMultiplier != 0:
             bal_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
 
-        bal_embed.set_thumbnail(url = user.display_avatar)
+        bal_embed.set_thumbnail(url = user.display_avatar.url)
         await ctx.send(embed=bal_embed)
     
     except Exception as Error:
