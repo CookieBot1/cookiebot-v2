@@ -5,8 +5,8 @@ from resources.mrcookie import instance as bot
 from resources.checks import lookup_server, new_server, update_server
 from resources.constants import JUNO_ID
 
-@bot.command(aliases = ["diddy"])
-async def juno(ctx):
+@bot.command(aliases = ["juno"])
+async def diddy(ctx):
     try:
         guildID = ctx.guild.id
 
