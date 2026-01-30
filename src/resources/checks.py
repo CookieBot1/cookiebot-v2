@@ -65,7 +65,9 @@ async def new_database(userID, guildID):
         "CountSaves": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
-        ##"UserSettings": [],
+        "Bio": "This user has no bio set.",
+        "ProfileOptions": {"Cookies": True, "Streaks": True, "Rank": True, "Counter Stats": True, "Count Fails": True, "Count Saves": True, "Rob Count": True, "Rob Gains": True, "Rob Chances": True},
+        "ProfileColor": 0x7289da
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
