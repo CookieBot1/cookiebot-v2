@@ -4,7 +4,7 @@ from discord.ext import commands
 from resources.mrcookie import instance as bot
 from resources.checks import lookup_counter, new_counter
 
-@bot.command(aliases = ["config", "setting"])
+@bot.command(aliases = ["setting"])
 async def settings(ctx, category = "general"):
     try:
         guildID = ctx.guild.id
