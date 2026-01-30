@@ -10,9 +10,9 @@ async def shop(ctx):
             color = 0x2ecc71,
             )
 
-        give_embed.add_field(name = "", value = "test", inline = False)
+        give_embed.add_field(name = "", value = "Coming soon.", inline = False)
         give_embed.set_author(name = "", icon_url = ctx.author.display_avatar)
-        give_embed.set_footer(text = "test")
+        give_embed.set_footer(text = "Coming soon.")
         await ctx.send(embed=give_embed)
 
     except Exception as Error:
