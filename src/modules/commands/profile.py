@@ -53,16 +53,47 @@ async def profile(ctx, userID = '0'):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
         userRobChances = userData["users"][userID]["RobChances"]
+        rob_pct = int(round(float(userRobChances) * 10))
 
-        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
+
+        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains/Bio/ProfileColor, REMOVE LATER!!!!!!
         userThing = userData["users"].get(userID, {})
 
         rob_count = userThing.get("RobCount")
         rob_gains = userThing.get("RobGains")
+        userProfileColor = userThing.get("ProfileColor")
+        userProfileBio = userThing.get("Bio")
 
         userRobCount = 0 if rob_count is None else int(rob_count)
         userRobGains = 0 if rob_gains is None else int(rob_gains)
+        userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
+        userProfileBio = "This user has no bio set." if userProfileBio is None else str(userProfileBio)
         ## ------------------------------------------------------------
+
+        default_opts = {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False}
+        profile_opts = userThing.get("ProfileOptions") or {}
+        # merge so new keys don't break old users
+        profile_opts = {**default_opts, **profile_opts}
+
+        show_cookies  = profile_opts.get("Cookies", True)
+        show_streaks  = profile_opts.get("Streaks", True)
+        show_counting = profile_opts.get("Counting", True)
+        show_robbery  = profile_opts.get("Robbery", True)
+        # show_inventory = profile_opts.get("Inventory", False)
+
+        ## -------------------------------------------------------------
+
+        def clamp(text: str, n: int = 140) -> str:
+            text = (text or "").strip()
+            if not text:
+                return "No bio set yet. Use `.customize profile` ✏️"
+            return text[:n] + ("…" if len(text) > n else "")
+
+        def fmt_int(x) -> str:
+            try:
+                return f"{int(x):,}"
+            except Exception:
+                return str(x)
 
         ## get user ranking by cookies (from leaderboard)
         guild_users: dict = userData.get("users", {})
@@ -78,41 +109,84 @@ async def profile(ctx, userID = '0'):
             if su.uid == str(userID):
                 this_user = su
 
+        about = clamp(userProfileBio, 160)
+        badges = []
 
-        if str(userID) == str(JUNO_ID): desc = "Haay Slayerzzz, I'm Juno! Welcoom to mah profile ig uwu 👑✨"
-        else: desc = "Bio coming soon!"
+        # cookies badges
+        '''if userCookies >= 1000:
+            badges.append("💰 Cookie Wealthy")
+        if userCookies >= 5000:
+            badges.append("🏦 Cookie Monster")
+        # streak badges
+        if userStreaks >= 7:
+            badges.append("🔥 Streaking")
+        if userStreaks >= 30:
+            badges.append("👑 Streak Legend")
+        # counting badges
+        if userCounter >= 500:
+            badges.append("🔢 Counter Main")
+        if userFailCounter == 0 and userCounter >= 50:
+            badges.append("🧼 Clean Counter")
+        # robbery badges
+        if userRobCount >= 25:
+            badges.append("🦹 Notorious")
+        if userRobGains >= 100:
+            badges.append("🍪 Heist Profits")'''
+        if str(userID) == str(JUNO_ID):
+            badges.append("💅")
+
+        badges_line = " ".join(badges) if badges else None
 
         ## build the embed
         stats_embed = discord.Embed(
             title = f"{member.display_name}'s Profile",
-            description = desc,
-            color = 0x7289da,
-            )
-    
-        stats_embed.add_field(name = "Cookies", value = userCookies, inline = True)
-        if userStreaks == 1: dayTerm = "Day"
-        else: dayTerm = "Days"
-        stats_embed.add_field(name = "Streaks", value = str(userStreaks) + " " + dayTerm, inline = True)
-        if userDailyMultiplier != 0:
-            stats_embed.add_field(name = "Daily Multiplier", value = str(userDailyMultiplier) + " Cookie Multiplier Active!", inline = False)
+            color = userProfileColor,
+        )
 
-        rank_value = this_user.position if this_user else "Unranked"
-        stats_embed.add_field(name = "Rank", value = rank_value, inline = True)
-        
-        stats_embed.add_field(name = "Counter Stats", value = str(userCounter) + " Numbers", inline = True)
-        stats_embed.add_field(name = "Count Fails", value = str(userFailCounter) + " Fails", inline = True)
-        stats_embed.add_field(name = "Count Saves", value = "WIP", inline = True)
+        if badges_line != None:
+            stats_embed.set_author(name = badges_line)
+        # about section
+        stats_embed.description = f"**About:**\n{about}"
 
-        stats_embed.add_field(name = "Rob Count", value = f"{userRobCount} Robber{'ies' if userRobCount != 1 else 'y'}", inline = True)
-        stats_embed.add_field(name = "Rob Gains", value = f"{userRobGains} Cookie{'s' if userRobGains != 1 else ''}", inline = True)
+        # cookie part
+        rank_value = f"#{this_user.position}" if this_user else "Unranked"
         stats_embed.add_field(
-            name="Rob Chances",
-            value=f"{100-(userRobChances * 10):.0f}%",
+            name="🍪 Cookies",
+            value=f"**Cookies:** {userCookies}\n**Rank:** {rank_value}",
+            inline=True
+        )
+
+        # spacer column
+        stats_embed.add_field(name="\u200b", value="\u200b", inline=True)
+
+        # streak part
+        day_term = "Day" if int(userStreaks) == 1 else "Days"
+        streak_line = f"**Daily:** {fmt_int(userStreaks)} {day_term}"
+        if userDailyMultiplier and int(userDailyMultiplier) != 0:
+            streak_line += f"\n**Multiplier:** x{userDailyMultiplier}"
+        stats_embed.add_field(
+            name="🔥 Streaks",
+            value=f"**Daily:** {userStreaks} Day",
+            inline=True
+        )
+
+        # counting part
+        stats_embed.add_field(
+            name="🔢 Counting",
+            value=f"**Numbers:** {fmt_int(userCounter)}\n**Fails:** {fmt_int(userFailCounter)}\n**Saves:** WIP",
+            inline=True
+        )
+
+        stats_embed.add_field(name="\u200b", value="\u200b", inline=True)
+
+        # rob part
+        stats_embed.add_field(
+            name="🦹 Robbery",
+            value=f"**Robberies:** {fmt_int(userRobCount)}\n**Gains:** {fmt_int(userRobGains)} 🍪\n**Chance:** {rob_pct}%",
             inline=True
         )
 
         stats_embed.set_thumbnail(url=member.display_avatar.url)
-        stats_embed.set_footer(text = "Customization coming soon!")
         
         await ctx.send(embed=stats_embed)
     
