@@ -132,8 +132,6 @@ async def profile(ctx, userID = '0'):
             badges.append("🦹 Notorious")
         if userRobGains >= 100:
             badges.append("🍪 Heist Profits")'''
-        if str(userID) == str(JUNO_ID):
-            badges.append("💅")
 
         badges_line = " ".join(badges) if badges else None
 
