@@ -1,6 +1,6 @@
 import discord
 from resources.checks import lookup_counter, update_counter, update_value, lookup_database, new_database
-from resources.constants import JUNO_ID
+from resources.constants import JUNO_ID, JOHN_ID
 from resources.mrcookie import instance as bot
 import ast
 import operator as op
@@ -104,7 +104,7 @@ async def on_message(message: discord.Message):
         highScore = counterData["settings"]["counter"]["highScore"]
 
         ## juno troll- ignore this ty
-        if str(userID) == str(JUNO_ID):
+        if str(userID) == str(JUNO_ID) or str(userID) == str(JOHN_ID):
             await message.add_reaction("<a:aibaby:1469090098770350316>")
 
         if parsed == savedCounter + 1:
