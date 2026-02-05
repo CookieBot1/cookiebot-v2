@@ -105,7 +105,7 @@ async def on_message(message: discord.Message):
 
         ## juno troll- ignore this ty
         if str(userID) == str(JUNO_ID):
-            await message.add_reaction("💅")
+            await message.add_reaction("<a:aibaby:1469090098770350316>")
 
         if parsed == savedCounter + 1:
             if userID != lastUser:
