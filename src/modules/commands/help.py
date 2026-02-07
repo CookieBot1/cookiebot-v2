@@ -54,7 +54,7 @@ async def help(ctx, category = "general"):
 
             help_embed.add_field(name = "📈 Stats", value =
             "View various statistics about your server and users!" + "\n" +
-            "``.profile`` ``.stats`` ``.leaderboard`` ``.balance``", inline = False)
+            "``.profile`` ``.customize`` ``.leaderboard`` ``.balance`` ``.stats``", inline = False)
 
             help_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=help_embed)
