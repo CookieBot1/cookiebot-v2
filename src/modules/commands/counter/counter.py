@@ -149,11 +149,11 @@ async def on_message(message: discord.Message):
 
         failedCount_embed = discord.Embed(
             title = "❌ Counter Reset",
-            description = "Start counting back at **1** again. Want to save the count? You can buy saves with cookies in ``.shop``",
+            description = "Start counting back at **1** again. Count revives coming soon!",
             color = 0x992d22
             )
 
-        failedCount_embed.set_footer(text = 'Want to see a leaderboard of who failed the most? Run ".failboard"')
+        failedCount_embed.set_footer(text = 'Want to see a leaderboard of who failed the most? Run ".leaderboard fails"')
         await channel.send(embed=failedCount_embed)
 
         await update_counter(guildID, "Counter", 0)
