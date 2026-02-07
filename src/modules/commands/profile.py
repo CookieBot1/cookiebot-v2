@@ -70,19 +70,6 @@ async def profile(ctx, userID = '0'):
         userProfileBio = "This user has no bio set." if userProfileBio is None else str(userProfileBio)
         ## ------------------------------------------------------------
 
-        default_opts = {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False}
-        profile_opts = userThing.get("ProfileOptions") or {}
-        # merge so new keys don't break old users
-        profile_opts = {**default_opts, **profile_opts}
-
-        show_cookies  = profile_opts.get("Cookies", True)
-        show_streaks  = profile_opts.get("Streaks", True)
-        show_counting = profile_opts.get("Counting", True)
-        show_robbery  = profile_opts.get("Robbery", True)
-        # show_inventory = profile_opts.get("Inventory", False)
-
-        ## -------------------------------------------------------------
-
         def clamp(text: str, n: int = 140) -> str:
             text = (text or "").strip()
             if not text:
@@ -141,48 +128,53 @@ async def profile(ctx, userID = '0'):
             color = userProfileColor,
         )
 
+        default_opts = {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False}
+        profile_opts = userThing.get("ProfileOptions") or {}
+        # merge so new keys don't break old users
+        profile_opts = {**default_opts, **profile_opts}
+
+        def add_spacer():
+            stats_embed.add_field(name="\u200b", value="\u200b", inline=True)
+
+        def add_section(name: str, value: str):
+            stats_embed.add_field(name=name, value=value, inline=True)
+
+        sections = []
+
         if badges_line != None:
             stats_embed.set_author(name = badges_line)
         # about section
         stats_embed.description = f"**About:**\n{about}"
 
-        # cookie part
-        rank_value = f"#{this_user.position}" if this_user else "Unranked"
-        stats_embed.add_field(
-            name="🍪 Cookies",
-            value=f"**Cookies:** {userCookies}\n**Rank:** {rank_value}",
-            inline=True
-        )
+        if profile_opts.get("Cookies", True):
+            rank_value = f"#{this_user.position}" if this_user else "Unranked"
+            ##sections.append(("🍪 Cookies", f"**Cookies**: {fmt_int(userCookies)}\n**Rank**: {rank_value}"))
+            sections.append(("🍪 Cookies", f"**{fmt_int(userCookies)}** Cookies\n**Rank** {rank_value}"))
 
-        # spacer column
-        stats_embed.add_field(name="\u200b", value="\u200b", inline=True)
+        if profile_opts.get("Streaks", True):
+            day_term = "Day" if int(userStreaks) == 1 else "Days"
+            streak_value = f"**{fmt_int(userStreaks)}** {day_term}"
+            if userDailyMultiplier and int(userDailyMultiplier) != 0:
+                streak_value += f"\nMultiplier: x{userDailyMultiplier}"
+            sections.append(("🔥 Streaks", streak_value))
 
-        # streak part
-        day_term = "Day" if int(userStreaks) == 1 else "Days"
-        streak_line = f"**Daily:** {fmt_int(userStreaks)} {day_term}"
-        if userDailyMultiplier and int(userDailyMultiplier) != 0:
-            streak_line += f"\n**Multiplier:** x{userDailyMultiplier}"
-        stats_embed.add_field(
-            name="🔥 Streaks",
-            value=f"**Daily:** {userStreaks} Day",
-            inline=True
-        )
+        if profile_opts.get("Counting", True):
+            sections.append(("🔢 Counting", f"**{fmt_int(userCounter)}** Counted\n**{fmt_int(userFailCounter)}** Fails\n**0** Saves"))
 
-        # counting part
-        stats_embed.add_field(
-            name="🔢 Counting",
-            value=f"**Numbers:** {fmt_int(userCounter)}\n**Fails:** {fmt_int(userFailCounter)}\n**Saves:** WIP",
-            inline=True
-        )
+        if profile_opts.get("Robbery", True):
+            sections.append(("💰 Robbery", f"**{fmt_int(userRobCount)}** Robberies\n**{fmt_int(userRobGains)}** Gains 🍪\n**{rob_pct}%** Chance"))
 
-        stats_embed.add_field(name="\u200b", value="\u200b", inline=True)
+        # Render in 2-wide rows with a middle spacer column
+        for i in range(0, len(sections), 2):
+            left = sections[i]
+            right = sections[i+1] if i + 1 < len(sections) else None
 
-        # rob part
-        stats_embed.add_field(
-            name="🦹 Robbery",
-            value=f"**Robberies:** {fmt_int(userRobCount)}\n**Gains:** {fmt_int(userRobGains)} 🍪\n**Chance:** {rob_pct}%",
-            inline=True
-        )
+            add_section(left[0], left[1])
+            add_spacer()
+            if right:
+                add_section(right[0], right[1])
+            else:
+                add_section("\u200b", "\u200b")
 
         stats_embed.set_thumbnail(url=member.display_avatar.url)
         
