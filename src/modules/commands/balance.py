@@ -50,7 +50,6 @@ async def balance(ctx, userID = '0'):
         userStreaks = userData["users"][userID]["Streaks"]
         userCookies = userData["users"][userID]["Cookies"]
         userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
-        profileColor = userData["users"][userID]["ProfileColor"]
 
         guild_users: dict = userData.get("users", {})
     
@@ -65,10 +64,20 @@ async def balance(ctx, userID = '0'):
             if su.uid == str(userID):
                 this_user = su
 
+        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO Bio/ProfileColor, REMOVE LATER!!!!!!
+        userThing = userData["users"].get(userID, {})
+
+        userProfileColor = userThing.get("ProfileColor")
+        userProfileBio = userThing.get("Bio")
+
+        userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
+        userProfileBio = "This user has no bio set." if userProfileBio is None else str(userProfileBio)
+        ## ------------------------------------------------------------
+
         ## send the embed
         bal_embed = discord.Embed(
             title = str(user.global_name) + "'s Cookie Balance",
-            color = profileColor,
+            color = userProfileColor,
             )
     
         bal_embed.add_field(name = "Cookies", value = userCookies, inline = True)
