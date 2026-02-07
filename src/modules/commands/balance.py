@@ -76,7 +76,7 @@ async def balance(ctx, userID = '0'):
 
         ## send the embed
         bal_embed = discord.Embed(
-            title = str(user.global_name) + "'s Cookie Balance",
+            title = f"{user.display_name}'s Cookie Balance",
             color = userProfileColor,
             )
     
