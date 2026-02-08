@@ -6,7 +6,7 @@ user_prompts: dict[str, str] = {
     "Quick! Repeat after me! Say `​g​﻿o​﻿o​﻿d​﻿ ﻿b​﻿o​﻿y`!": "good boy",
     "Quick! Repeat after me! Say '​l​​﻿o​﻿l​﻿y​﻿o​﻿u​﻿h​﻿a​﻿d​﻿t​﻿o​﻿t​﻿y​﻿p​﻿e​﻿a​﻿l​﻿l​﻿t​﻿h​﻿i​﻿s'!": "lolyouhadtotypeallthis",
     "Quick! Repeat after me! Say `​h​﻿a​﻿r​﻿r​﻿y​﻿i​﻿s​﻿a​﻿w​﻿i​﻿z​﻿a​﻿r​﻿d`!": "harryisawizard",
-    "Quick! Repeat after me! Say `​c​﻿o​﻿l​﻿l​﻿e​﻿c​﻿t'!": "collect",
+    "Quick! Repeat after me! Say `​c​﻿o​﻿l​﻿l​﻿e​﻿c​﻿t`!": "collect",
     "Quick! Repeat after me! Say `​g​﻿r​﻿a​﻿b`!": "grab",
     "Quick! Repeat after me! Say `​m​﻿i​﻿n​﻿e`!": "mine",
     "Quick! Repeat after me! Say `​n​﻿a​﻿b`!": "nab",
