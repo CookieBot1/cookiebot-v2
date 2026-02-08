@@ -37,59 +37,180 @@ async def help(ctx, category = "general"):
             help_embed.set_author(name = "CookieBot Help Page", icon_url = ctx.bot.user.avatar)
 
             help_embed.add_field(name = "📖 Info", value = 
-            "All the general information commands about CookieBot." + "\n" +
+            "All the general info commands about CookieBot." + "\n" +
             "``.help`` ``.ping`` ``.info`` ``.invite``", inline = False)
     
             help_embed.add_field(name = "⚙️ Settings", value =
             "Commands to customize CookieBot's settings in your server." + "\n" + 
-            "``.settings`` ``.ignoredrops`` ``.configcounter`` ``.setcounterchannel`` ``.resetcounter`` ", inline = False)
+            "``.settings`` ``.ignoredrops`` ``.setcounterchannel`` ``.resetcounter`` ", inline = False)
             
             help_embed.add_field(name = "✏️ Counter", value =
             "All the commands involving the counting game!" + "\n" +
             "``.savecount`` ``.skipcount``", inline = False)
             
             help_embed.add_field(name = "🍪 Cookies", value =
-            "All the fun commands involving cookies!" + "\n" +
+            "All the economy commands involving cookies." + "\n" +
             "``.daily`` ``.rob`` ``.give`` ``.eat`` ``.shop``", inline = False)
 
             help_embed.add_field(name = "📈 Stats", value =
-            "View various statistics about your server and users!" + "\n" +
+            "View fun statistics about the server and users!" + "\n" +
             "``.profile`` ``.customize`` ``.leaderboard`` ``.balance`` ``.stats``", inline = False)
 
             help_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=help_embed)
         
         if category == "info":
-            await ctx.send("Info section WIP")
+            # send the info embed
+            info_embed = discord.Embed(
+                description = "General info commands about CookieBot.",
+                color = 0x9b59b6,
+                )
+    
+            # title and profile icon
+            info_embed.set_author(name = "Info Help Page", icon_url = ctx.bot.user.avatar)
+
+            info_embed.add_field(name = "🔹 Help Page", value = 
+            "Lists all available CookieBot commands." + "\n" +
+            "Usage: ``.help`` or ``.help <category>``" + "\n" +
+            "``<category>`` can be either ``info``, ``settings``, ``counter``, ``cookies``, or ``stats``.", inline = False)
+    
+            info_embed.add_field(name = "🔹 Ping", value = 
+            "Sends the bot's latency." + "\n" +
+            "Usage: ``.ping``", inline = False)
+            
+            info_embed.add_field(name = "🔹 Bot Info", value =
+            "Sends statistical information about CookieBot." + "\n" +
+            "Usage: ``.info``", inline = False)
+            
+            info_embed.add_field(name = "🔹 Bot Invite", value =
+            "Invite CookieBot to your server." + "\n" +
+            "Usage: ``.invite``", inline = False)
+
+            info_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=info_embed)
         
         if category == "settings":
-            await ctx.send("Settings section WIP")
+            # send the settings embed
+            settings_embed = discord.Embed(
+                description = "Commands to customize CookieBot's settings in your server.",
+                color = 0x9b59b6,
+                )
+    
+            # title and profile icon
+            settings_embed.set_author(name = "Settings Help Page", icon_url = ctx.bot.user.avatar)
+
+            settings_embed.add_field(name = "🔹 Server Settings", value = 
+            "View server settings such as counter configuration and ignored drops." + "\n" +
+            "Usage: ``.settings (optional: category)``" + "\n" +
+            "``category`` can be either ``counter`` or ``cookie`` to view specific settings.", inline = False)
+    
+            settings_embed.add_field(name = "🔹 Ignore Cookie Drops", value = 
+            "Change which channels ignore cookie drops." + "\n" +
+            "Usage: ``.ignoredrops``", inline = False)
+            
+            settings_embed.add_field(name = "🔹 Set Counter Channel", value =
+            "Start the prompt to select the channel where users can start counting." + "\n" +
+            "Usage: ``.setcounterchannel``", inline = False)
+            
+            settings_embed.add_field(name = "🔹 Reset Counter Channel", value =
+            "Reset the channel where counting is tracked." + "\n" +
+            "Usage: ``.resetcounterchannel``", inline = False)
+
+            settings_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=settings_embed)
 
         if category == "counter":
-            await ctx.send("Counter section WIP")
+            # send the counter embed
+            counter_embed = discord.Embed(
+                description = "All the commands involving the counting game!",
+                color = 0x9b59b6,
+                )
+    
+            # title and profile icon
+            counter_embed.set_author(name = "Counter Help Page", icon_url = ctx.bot.user.avatar)
+
+            counter_embed.add_field(name = "🔹 Revive Count", value = 
+            "Restore the count if someone messes up." + "\n" +
+            "Usage: ``.savecount``", inline = False)
+    
+            counter_embed.add_field(name = "🔹 Skip Count", value = 
+            "Skip the current number by a random amount just to troll." + "\n" +
+            "Usage: ``.skipcount``", inline = False)
+
+            counter_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=counter_embed)
 
         if category == "cookies":
-            await ctx.send("Cookies section WIP")
+            # send the counter embed
+            counter_embed = discord.Embed(
+                description = "All the economy commands involving cookies.",
+                color = 0x9b59b6,
+                )
+    
+            # title and profile icon
+            counter_embed.set_author(name = "Cookies Help Page", icon_url = ctx.bot.user.avatar)
+
+            counter_embed.add_field(name = "🔹 Daily Cookies", value = 
+            "Collect your daily cookies reward." + "\n" +
+            "Usage: ``.daily``", inline = False)
+    
+            counter_embed.add_field(name = "🔹 Robbery", value = 
+            "Attempt to rob cookies from another user. Chances are random." + "\n" +
+            "Usage: ``.rob (user)``" + "\n" +
+            "``user`` can be a mention or user ID.", inline = False)
+
+            counter_embed.add_field(name = "🔹 Give Cookies", value = 
+            "Give cookies to another user." + "\n" +
+            "Usage: ``.give (user) (amount)``" + "\n" +
+            "``user`` can be a mention or user ID.", inline = False)
+
+            counter_embed.add_field(name = "🔹 Eat Cookies", value = 
+            "Eat one cookie at a time, there's no benefit to this lol." + "\n" +
+            "Usage: ``.eat (amount)``", inline = False)
+
+            counter_embed.add_field(name = "🔹 Cookie Shop", value = 
+            "Browse and purchase items from the cookie shop." + "\n" +
+            "Usage: ``.shop``", inline = False)
+
+            counter_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=counter_embed)
 
         if category == "stats":
-            await ctx.send("Stats section WIP")
+            # send the stats embed
+            stats_embed = discord.Embed(
+                description = "View fun statistics about the server and users!",
+                color = 0x9b59b6,
+                )
+    
+            # title and profile icon
+            stats_embed.set_author(name = "Stats Help Page", icon_url = ctx.bot.user.avatar)
 
+            stats_embed.add_field(name = "🔹 User Profile", value = 
+            "View your or someone else's customizable profile!" + "\n" +
+            "Usage: ``.profile (optional: user)``" + "\n" +
+            "``user`` can be a mention or user ID.", inline = False)
+    
+            stats_embed.add_field(name = "🔹 Customize Your Settings", value = 
+            "Customize your profile and other preferences." + "\n" +
+            "Usage: ``.customize (optional: option)``" + "\n" +
+            "``option`` can be ``profile``.", inline = False)
 
-        '''"``.help``➙ View this help page to learn about CookieBot." + "\n" +
-        "``.ping`` ➙ Find the latency from the bot to Discord." + "\n" +
-        "``.info`` ➙ [Aliases: status] Information about the bot's status and more." + "\n" +
-        "``.invite`` ➙ Invite CookieBot to your server. ", inline = True)'''
+            stats_embed.add_field(name = "🔹 Server Leaderboards", value = 
+            "View leaderboards for various categories." + "\n" +
+            "Usage: ``.leaderboard (optional: category)``" + "\n" +
+            "``category`` can be ``cookies``, ``count``, or ``countfail``.", inline = False)
 
-        '''"``.daily`` ➙ Collect free cookies once everyday, amount increases based on streak." + "\n" + 
-        "``.rob (user)`` ➙ Try to steal another user's cookies, but you may not succeed." + "\n" +
-        "``.eat`` ➙ Eat one cookie cause you're hungry." + "\n" +
-        "``.give (user) (amount)`` ➙ [Aliases: transfer, gift] Give another user some of your cookies.", inline = True)'''
+            stats_embed.add_field(name = "🔹 Cookie Balance", value = 
+            "View your or someone else's cookie balance." + "\n" +
+            "Usage: ``.balance (optional: user)``" + "\n" +
+            "``user`` can be a mention or user ID.", inline = False)
 
-        '''"``.leaderboard`` ➙ [Aliases: lb] View who has the highest cookies in this server." + "\n" +
-        "``.stats (optional: user)`` ➙ View complete statistics of a user." + "\n" +
-        "``.bal (optional: user)`` ➙ [Aliases: balance] View your or another user's cookie balance.", inline = True)'''
+            stats_embed.add_field(name = "🔹 Fun Server Stats", value = 
+            "View highest stats in the server such as most robberies, cookies, counting, and more!" + "\n" +
+            "Usage: ``.stats``", inline = False)
 
-        '''"``.say (optional: channelID) (message)`` ➙ Have the bot post your message.", inline = True)'''
+            stats_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=stats_embed)
     
     except Exception as Error:
         await ctx.send(Error)
