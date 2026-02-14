@@ -179,7 +179,7 @@ async def customize(ctx, category: str = "general", section: str | None = None):
         if category == "general":
             # send the general customize embed
             general_embed = discord.Embed(
-                description = "Use ``.customize <option>`` to edit any of the following!",
+                description = "Here's a list of all the user customization options!",
                 color = 0x9b59b6,
                 )
     
@@ -187,6 +187,7 @@ async def customize(ctx, category: str = "general", section: str | None = None):
             general_embed.set_author(name = "Customize Page", icon_url = ctx.author.display_avatar.url)
 
             general_embed.add_field(name = "👤 Profile", value = "Edit your profile page by using the following command:" + "\n" + "``.customize profile <optional: bio, color, stats>``", inline = False)
+            general_embed.add_field(name = "🔔 Alerts", value = "Edit your alert settings by using the following command:" + "\n" + "``.alert <optional: on/off>``", inline = False)
 
             general_embed.set_footer(text = "More options coming soon!")
             return await ctx.send(embed=general_embed)
