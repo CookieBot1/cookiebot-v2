@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import discord
 
-from modules.commands.robbing.messages import success_list, fail_list, gifted_fail_list, juno_fail_list
+from modules.commands.robbing.messages import success_list, fail_list, gifted_fail_list
 from resources.checks import (
     is_blacklisted,
     lookup_database,
@@ -164,10 +164,6 @@ async def rob(ctx, userID="0"):
                 embed_desc += f" and gained YOUR ``{lost_cookies}`` cookies because {gifted_fail_msg}!"
             ## else, the lost cookies are gone forever
             else:
-                ## check if juno ID
-                if str(sender_id) == str(JUNO_ID):
-                    fail_msg = juno_fail_list[random.choice(range(0, len(juno_fail_list)))]
-
                 embed_desc += (
                     f" and you lost ``{lost_cookies}`` cookies by {fail_msg}!"
                 )

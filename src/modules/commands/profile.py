@@ -4,7 +4,6 @@ from typing import Optional
 from attrs import define, field
 
 from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
-from resources.constants import JUNO_ID
 
 @define()
 class SimpleUser:
