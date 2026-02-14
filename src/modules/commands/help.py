@@ -38,7 +38,7 @@ async def help(ctx, category = "general"):
 
             help_embed.add_field(name = "📖 Info", value = 
             "All the general info commands about CookieBot." + "\n" +
-            "``.help`` ``.ping`` ``.info`` ``.invite``", inline = False)
+            "``.alerts`` ``.help`` ``.ping`` ``.info`` ``.invite``", inline = False)
     
             help_embed.add_field(name = "⚙️ Settings", value =
             "Commands to customize CookieBot's settings in your server." + "\n" + 
@@ -68,6 +68,11 @@ async def help(ctx, category = "general"):
     
             # title and profile icon
             info_embed.set_author(name = "Info Help Page", icon_url = ctx.bot.user.avatar)
+
+            info_embed.add_field(name = "🔹 Developer Alerts", value = 
+            "Toggle developer alerts for updates and announcements." + "\n" +
+            "For more info on developer alerts, run ``.alert help``." + "\n" +
+            "Usage: ``.alert on`` or ``.alert off`` to toggle. To read alerts, run ``.alert``.", inline = False)
 
             info_embed.add_field(name = "🔹 Help Page", value = 
             "Lists all available CookieBot commands." + "\n" +
@@ -192,8 +197,7 @@ async def help(ctx, category = "general"):
     
             stats_embed.add_field(name = "🔹 Customize Your Settings", value = 
             "Customize your profile and other preferences." + "\n" +
-            "Usage: ``.customize (optional: option)``" + "\n" +
-            "``option`` can be ``profile``.", inline = False)
+            "Usage: ``.customize to see what you can configure.``", inline = False)
 
             stats_embed.add_field(name = "🔹 Server Leaderboards", value = 
             "View leaderboards for various categories." + "\n" +
