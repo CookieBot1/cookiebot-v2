@@ -12,7 +12,7 @@ from resources.checks import (
     update_value,
     validate_user,
 )
-from resources.constants import EMBED_GREEN, EMBED_RED, JUNO_ID
+from resources.constants import EMBED_GREEN, EMBED_RED
 from resources.mrcookie import instance as bot
 
 
