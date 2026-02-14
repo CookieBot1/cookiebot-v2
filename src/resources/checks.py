@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import discord
 
@@ -27,6 +27,23 @@ async def validate_user(userID):
     else:
         return userID
 
+
+# bot_central data
+async def lookup_bot_central():
+    data = await bot.db.find_bot_central({"_id": "bot_central"})
+    if data != None:
+        return data
+    else:
+        return False
+
+async def update_devalerts(date, message: dict, expires_at=None):
+    alert = {
+        "date": date,
+        "expiresAt": expires_at.isoformat() if expires_at else None,
+        "message": message
+    }
+
+    await bot.db.update_bot_central({"$push": {"DevAlerts": alert}})
 
 # user data
 async def lookup_database(userID, guildID):
@@ -67,7 +84,13 @@ async def new_database(userID, guildID):
         "Inventory": "Empty",
         "Bio": "This user has no bio set.",
         "ProfileOptions": {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False},
-        "ProfileColor": 0x7289da
+        "ProfileColor": 0x7289da,
+        "DevAlerts": False,
+        "AlertState": {
+            "readId": None,
+            "pingForId": None,
+            "pingCount": 0
+        }
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
