@@ -68,6 +68,18 @@ class MongoDB:
     async def del_blacklist(self, doc):
         await self.db.blacklist_users.delete_one(doc)
 
+    # bot_central collection
+    async def find_bot_central(self, doc):
+        document = await self.db.bot_central.find_one(doc)
+        return document
+
+    async def update_bot_central(self, update):
+        await self.db.bot_central.update_one({"_id": "bot_central"}, update, upsert=True)
+    
+    async def delete_bot_central(self, doc):
+        await self.db.bot_central.delete_one(doc)
+
+
     # master_data collection
     async def find_user(self, doc):
         document = await self.db.master_data.find_one(doc)
@@ -80,6 +92,7 @@ class MongoDB:
         return document
     async def update_old_one(self, dict, set):
         await self.db.cookieDict.update_one(dict, set, upsert=True)
+    ##---------------
     
 
     async def update_one(self, dict, set):
