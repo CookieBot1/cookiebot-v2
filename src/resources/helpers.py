@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 from resources.mrcookie import instance as bot
 
+from datetime import datetime, timezone
+
+
 YES = {"yes", "y", "true", "on", "enable", "enabled"}
 NO  = {"no", "n", "false", "off", "disable", "disabled"}
 
@@ -79,3 +82,15 @@ def make_check(ctx):
             and m.guild is not None
         )
     return _check
+
+def get_latest_active_alert():
+    alert = bot.latest_alert
+    if not alert:
+        return None
+
+    exp = alert.get("expiresAt")
+    if exp and datetime.fromisoformat(exp) <= datetime.now(timezone.utc):
+        bot.latest_alert = None
+        return None
+
+    return alert
