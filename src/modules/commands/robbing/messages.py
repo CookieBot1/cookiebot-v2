@@ -64,18 +64,3 @@ gifted_fail_list = [
     "they were a ninja in disguise and you cried and ran away",
     "they had a secret weapon.. a water gun filled with hot sauce.. NOT THE EYES!!"
 ]
-
-juno_fail_list = [
-    "you wanted to take a pic with Diddy.. but then you slipped from all the baby oil..",
-    "you tried to rob Diddy but he challenged you to a dance off and you lost miserably",
-    "you wanted to be in David's next album.. 😭",
-    "you lowkey just tripped on a tiny pebble.. OFC YOU DID..",
-    "you were too short to reach the cookie jar.. 🫵😂",
-    "you got distracted by a butterfly mid-robbery and lost focus tbh",
-    "you were too busy fangirling over iron man, so you tripped and fell- worth it.",
-    "your robbery just didn't 💅 slay 💅 enough, sorry 🥺",
-    "you got kidnapped by the teletubbie cartel, they wanted their sun back 😂",
-    "you got deported by ICE, NGL we all knew it was gonna happen someday 😂",
-    "I ran out of ideas and I think you just lowkenuinely blew up or smthing idk",
-    "you sang.. in the back of my MIND- you diedd.. then said this song is an inspiration to u 😇"
-]
