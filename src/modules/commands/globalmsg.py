@@ -39,7 +39,7 @@ async def globalmsg(ctx):
             raise Exception("Prompt cancelled.")
         embed_desc = response.content
 
-        prompt_embed = prompt("Do you want your name to be as the **author** of the embed? Say ``yes`` or ``no``.\n If no, MrCookie will be written as the author.")
+        prompt_embed = prompt("Do you want your name to be as the **author** of the embed? Say ``yes`` or ``no``.\n If no, CookieBot will be written as the author.")
         await ctx.send(embed=prompt_embed)
         response = await bot.wait_for("message", check=check, timeout=60.0)
         if response.content.lower() == "cancel":
@@ -67,9 +67,9 @@ async def globalmsg(ctx):
         build_embed.set_thumbnail(url=bot.user.avatar.url)
         
         if embed_author == -1:
-            build_embed.set_author(name= "GLOBAL ANNOUNCEMENT", icon_url=bot.user.avatar.url)
+            build_embed.set_author(name= "Global Announcement", icon_url=bot.user.avatar.url)
         if embed_author == 0:
-            build_embed.set_author(name= "GLOBAL ANNOUNCEMENT", icon_url=ctx.author.avatar.url)
+            build_embed.set_author(name= "Global Announcement", icon_url=ctx.author.avatar.url)
 
         await ctx.send(embed=build_embed)
 
