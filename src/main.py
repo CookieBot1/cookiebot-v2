@@ -31,6 +31,8 @@ async def main():
         intents=intents,
     )
 
+    bot.latest_alert = None
+
     MODULES = ["modules/commands", "modules/events", "modules/commands/drops", "modules/commands/counter"]
     bot.remove_command('help') # remove the default help command
 
