@@ -1,8 +1,41 @@
 from resources.mrcookie import instance as bot
 import discord
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from resources.checks import lookup_database, new_database, update_database
+from resources.checks import lookup_database, new_database, update_database, lookup_bot_central
+from resources.helpers import get_latest_active_alert
+
+async def send_dev_alert(ctx, userData, userID):
+    # respect per-guild subscription toggle
+    u = userData["users"][userID]
+    if not bool(u.get("DevAlerts", False)):
+        return
+
+    latest_alert = get_latest_active_alert()
+    if not latest_alert:
+        return
+
+    current_id = latest_alert.get("date")
+    state = u.get("AlertState", {})
+    read_id = state.get("readId")
+    ping_for = state.get("pingForId")
+    ping_count = int(state.get("pingCount", 0))
+
+    # if new alert, reset ping tracking
+    if ping_for != current_id:
+        ping_for = current_id
+        ping_count = 0
+
+    # If unread for this alert and under 2 reminders
+    if read_id != current_id and ping_count < 2:
+        await ctx.send("Hey, <@!" + str(ctx.author.id) + ">! There's a 🔔 **New Developer Alert!** Run `.alert` to view it.")
+        ping_count += 1
+
+    u["AlertState"] = {
+        "readId": read_id,
+        "pingForId": ping_for,
+        "pingCount": ping_count
+    }
 
 @bot.command()
 async def daily(ctx):
@@ -35,7 +68,7 @@ async def daily(ctx):
             cooldown_embed.set_author(name = "Not yet " + str(user.display_name) + "!", icon_url = user.display_avatar)
             await ctx.send(embed=cooldown_embed)
             return
-        
+
         ## calculate and give daily cookies
         BaseCookies = 15
         Multiplier = 0
@@ -67,6 +100,8 @@ async def daily(ctx):
         dailyembed.set_author(name = "Daily Cookies - " + str(user.display_name), icon_url = user.display_avatar)
         dailyembed.set_footer(text = "You can collect again in 23 hours.")
         await ctx.send(embed=dailyembed)
+
+        await send_dev_alert(ctx, userData, userID) ## check for dev alert and ping if unread
 
         ## update the database
         userData["users"][userID]["Cookies"] = userCookies
