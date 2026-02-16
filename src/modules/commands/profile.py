@@ -66,7 +66,7 @@ async def profile(ctx, userID = '0'):
         userRobCount = 0 if rob_count is None else int(rob_count)
         userRobGains = 0 if rob_gains is None else int(rob_gains)
         userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
-        userProfileBio = "This user has no bio set." if userProfileBio is None else str(userProfileBio)
+        userProfileBio = "No bio set. Run ``.customize profile`` to set one!" if userProfileBio is None else str(userProfileBio)
         ## ------------------------------------------------------------
 
         def clamp(text: str, n: int = 140) -> str:

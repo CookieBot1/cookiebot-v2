@@ -82,7 +82,7 @@ async def new_database(userID, guildID):
         "CountSaves": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
-        "Bio": "This user has no bio set.",
+        "Bio": "No bio set. Run ``.customize profile`` to set one!",
         "ProfileOptions": {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False},
         "ProfileColor": 0x7289da,
         "DevAlerts": False,
@@ -165,4 +165,9 @@ async def update_server(guildID, item, new_value):
 async def update_ignored_drops(guildID, new_value: list):
     await bot.db.update_one(
         {"_id": str(guildID)}, {"$set": {"settings.server.IgnoredChannelDrops": new_value}}
+    )
+
+async def update_ignored_channels(guildID, new_value: list):
+    await bot.db.update_one(
+        {"_id": str(guildID)}, {"$set": {"settings.server.IgnoredChannels": new_value}}
     )
