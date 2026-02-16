@@ -21,7 +21,7 @@ async def settings(ctx, category = "general"):
             await new_counter(guildID)
             counterData = await lookup_counter(guildID)
         
-        if category == "general":
+        if category == "general" or category == "gen" or category == "view":
             # send the basic settings embed
             settings_embed = discord.Embed(
                 description = "Use ``.settings (category)`` for more information!",
