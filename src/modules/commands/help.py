@@ -42,7 +42,7 @@ async def help(ctx, category = "general"):
     
             help_embed.add_field(name = "⚙️ Settings", value =
             "Commands to customize CookieBot's settings in your server." + "\n" + 
-            "``.settings`` ``.ignoredrops`` ``.setcounterchannel`` ``.resetcounter`` ", inline = False)
+            "``.settings`` ``.ignoredrops`` ``.ignorechannels`` ``.setcounter`` ``.editcounter`` ``.resetcounter`` ", inline = False)
             
             help_embed.add_field(name = "✏️ Counter", value =
             "All the commands involving the counting game!" + "\n" +
@@ -97,7 +97,7 @@ async def help(ctx, category = "general"):
         if category == "settings":
             # send the settings embed
             settings_embed = discord.Embed(
-                description = "Commands to customize CookieBot's settings in your server.",
+                description = "Commands to customize CookieBot's settings in your server. All of the following commands require the ``Manage Server`` permission.",
                 color = 0x9b59b6,
                 )
     
@@ -110,13 +110,21 @@ async def help(ctx, category = "general"):
             "``category`` can be either ``counter`` or ``cookie`` to view specific settings.", inline = False)
     
             settings_embed.add_field(name = "🔹 Ignore Cookie Drops", value = 
-            "Change which channels ignore cookie drops." + "\n" +
-            "Usage: ``.ignoredrops``", inline = False)
+            "Change which channels ignore cookie drops. Commands can still be run in these channels unless disabled." + "\n" +
+            "Usage: ``.ignoredrops (optional: #channel)``", inline = False)
+
+            settings_embed.add_field(name = "🔹 Ignore Command Channels", value = 
+            "Change which channels ignore command usage. Cookie drops are still sent in these channels unless disabled." + "\n" +
+            "Usage: ``.ignorechannels (optional: #channel)``", inline = False)
             
             settings_embed.add_field(name = "🔹 Set Counter Channel", value =
             "Start the prompt to select the channel where users can start counting." + "\n" +
             "Usage: ``.setcounterchannel``", inline = False)
-            
+
+            settings_embed.add_field(name = "🔹 Edit Counter Settings", value =
+            "Edit the settings for the counter in your server." + "\n" +
+            "Usage: ``.editcounter (feature)``", inline = False)
+
             settings_embed.add_field(name = "🔹 Reset Counter Channel", value =
             "Reset the channel where counting is tracked." + "\n" +
             "Usage: ``.resetcounterchannel``", inline = False)
