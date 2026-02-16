@@ -1,23 +1,30 @@
 from resources.mrcookie import instance as bot
 from resources.checks import update_counter, lookup_counter, new_counter
-from resources.helpers import ask_yes_no, ask_role, make_check
+from resources.helpers import ask_yes_no, ask_role, make_check, SetupCancelled, handle_cancel
 import discord
 from discord.ext import commands
 import asyncio
 
+
 async def ask_number_or_none(ctx, question: str, *, timeout: float = 30.0, cleanup=None):
-    qmsg = await ctx.send(question)
+    qmsg = await ctx.send(question + "Type `cancel` to stop setup.")
     if cleanup is not None:
         cleanup.append(qmsg)
 
-
     def check(m: discord.Message) -> bool:
-        return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id and m.guild is not None
+        return (
+            m.author.id == ctx.author.id
+            and m.channel.id == ctx.channel.id
+            and m.guild is not None
+        )
 
     try:
         msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
         if cleanup is not None:
             cleanup.append(msg)
+
+        await handle_cancel(msg)
+
         content = msg.content.strip().lower()
 
         if content in {"none", "off", "disable", "disabled"}:
@@ -33,7 +40,7 @@ async def ask_number_or_none(ctx, question: str, *, timeout: float = 30.0, clean
             await ctx.send("Not a number. No number set.")
             return None
 
-    except TimeoutError:
+    except asyncio.TimeoutError:
         await ctx.send("No response. No number set.")
         return None
 
@@ -62,7 +69,7 @@ async def setcounter(ctx):
         prompt = await ctx.send(
             "Enable math expressions in the counting channel? "
             "(example: `1+1` counts as `2`)\n"
-            "Reply with `yes` or `no` within **30 seconds**. You can always change this later by running.. <cmd coming soon>"
+            "Reply with `yes` or `no` within **30 seconds**. Type `cancel` to stop setup."
         )
         cleanup.append(prompt)
 
@@ -71,16 +78,17 @@ async def setcounter(ctx):
             check = make_check(ctx)
             reply: discord.Message = await bot.wait_for("message", timeout=30.0, check=check)
             cleanup.append(reply)
-            content = reply.content.strip().lower()
 
+            await handle_cancel(reply)
+
+            content = reply.content.strip().lower()
             if content in ("yes", "y", "true", "on", "enable", "enabled"):
                 allow_math = True
             elif content in ("no", "n", "false", "off", "disable", "disabled"):
                 allow_math = False
             else:
-                # if bad response, just keep the default
                 await ctx.send("Invalid response — leaving math expressions **disabled**.")
-        except TimeoutError:
+        except asyncio.TimeoutError:
             await ctx.send("No response — leaving math expressions **disabled**.")
 
         await update_counter(guildID, "AllowMath", allow_math)
@@ -130,6 +138,8 @@ async def setcounter(ctx):
             except Exception:
                 pass
 
-
+    except SetupCancelled:
+        await ctx.send("❌ Setup cancelled.")
+        return
     except Exception as Error:
         await ctx.send(Error)
