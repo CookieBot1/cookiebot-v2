@@ -94,3 +94,9 @@ def get_latest_active_alert():
         return None
 
     return alert
+
+def get_guild_icon(ctx):
+    try:
+        return ctx.guild.icon.url
+    except AttributeError:
+        return ctx.bot.user.display_avatar.url

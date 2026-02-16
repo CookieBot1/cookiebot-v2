@@ -1,6 +1,7 @@
 from resources.mrcookie import instance as bot
 import discord
 
+from resources.helpers import get_guild_icon
 from resources.checks import lookup_counter, lookup_server, new_counter
 from typing import Optional
 from attrs import define, field
@@ -83,7 +84,7 @@ async def stats(ctx):
             rich_rob_name = user.global_name or user.name
         stats_embed.add_field(name = "💰 Richest Thief", value = f"**{rich_rob_name}** stole **{rich_rob_val}** cookie{'s' if rich_rob_val != 1 else ''}", inline = False)
 
-        stats_embed.set_thumbnail(url = guild.icon.url)
+        stats_embed.set_thumbnail(url=get_guild_icon(ctx))
 
         await ctx.send(embed=stats_embed)
 

@@ -6,6 +6,7 @@ import discord
 from attrs import define, field
 from discord.ext import commands
 
+from resources.helpers import get_guild_icon
 from resources.constants import UNICODE_LEFT, UNICODE_RIGHT
 from resources.mrcookie import instance as bot
 
@@ -71,7 +72,7 @@ async def leaderboard(ctx: commands.Context, lbtype: str = "cookies"):
 
     # ----- Build new Embed -----
     embed = await build_embed(guild_users, str(ctx.author.id), lbtype=lbtype)
-    embed.set_thumbnail(url=ctx.guild.icon.url)
+    embed.set_thumbnail(url=get_guild_icon(ctx))
 
     # ----- Add Buttons -----
     max_pages = math.ceil(len(guild_users) / MAX_USERS_PER_PAGE)
