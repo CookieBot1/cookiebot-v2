@@ -1,4 +1,4 @@
-from resources.checks import is_blacklisted, lookup_counter
+from resources.checks import is_blacklisted, lookup_counter, lookup_server, new_server
 from resources.mrcookie import instance as bot
 import discord
 
@@ -10,8 +10,22 @@ import random
 
 @bot.event
 async def on_message(message):
+    # ignore bots + blacklisted users
     if message.author.bot or await is_blacklisted(message.author.id):
         return
+
+    # Block COMMANDS in ignored channels
+    if message.guild is not None:
+        server_data = await lookup_server(message.guild.id)
+        if server_data is False:
+            await new_server(message.guild.id)
+            server_data = await lookup_server(message.guild.id)
+
+        ignored_cmd_channels = server_data["settings"]["server"].get("IgnoredChannels", [])
+        if message.channel.id in ignored_cmd_channels:
+            return 
+
+    # allow commands everywhere else
     await bot.process_commands(message)
 
 @bot.listen()
