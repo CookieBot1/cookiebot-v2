@@ -3,42 +3,56 @@ from discord.ext import commands
 from resources.mrcookie import instance as bot
 
 from datetime import datetime, timezone
+import asyncio
 
 
 YES = {"yes", "y", "true", "on", "enable", "enabled"}
 NO  = {"no", "n", "false", "off", "disable", "disabled"}
 
+
+
+class SetupCancelled(Exception):
+    pass
+
+CANCEL_WORDS = {"cancel", "stop", "quit", "exit", "abort"}
+
+async def handle_cancel(msg):
+    if msg.content and msg.content.strip().lower() in CANCEL_WORDS:
+        raise SetupCancelled()
+
 async def ask_yes_no(ctx, question: str, *, timeout: float = 30.0, default: bool = False, cleanup=None) -> bool:
-    qmsg = await ctx.send(question)
-    if cleanup is not None:
-        cleanup.append(qmsg)
-
-
-    def check(m: discord.Message) -> bool:
-        return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id and m.guild is not None
-
-    try:
-        msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
+    if question:
+        qmsg = await ctx.send(question + " Type `cancel` to stop setup.")
         if cleanup is not None:
-            cleanup.append(msg)
+            cleanup.append(qmsg)
 
-        content = msg.content.strip().lower()
+        def check(m: discord.Message) -> bool:
+            return m.author.id == ctx.author.id and m.channel.id == ctx.channel.id and m.guild is not None
 
-        if content in YES:
-            return True
-        if content in NO:
-            return False
+        try:
+            msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
+            if cleanup is not None:
+                cleanup.append(msg)
 
-        await ctx.send(f"Invalid response - Using default: **{default}**.")
-        return default
+            await handle_cancel(msg)
 
-    except TimeoutError:
-        await ctx.send(f"No response — using default: **{default}**.")
-        return default
+            content = msg.content.strip().lower()
+
+            if content in YES:
+                return True
+            if content in NO:
+                return False
+
+            await ctx.send(f"Invalid response - Using default: **{default}**.")
+            return default
+
+        except asyncio.TimeoutError:
+            await ctx.send(f"No response — using default: **{default}**.")
+            return default
 
 
 async def ask_role(ctx, question: str, *, timeout: float = 45.0, cleanup=None):
-    qmsg = await ctx.send(question)
+    qmsg = await ctx.send(question + " Type `cancel` to stop setup.")
     if cleanup is not None:
         cleanup.append(qmsg)
 
@@ -49,6 +63,8 @@ async def ask_role(ctx, question: str, *, timeout: float = 45.0, cleanup=None):
         msg: discord.Message = await bot.wait_for("message", timeout=timeout, check=check)
         if cleanup is not None:
             cleanup.append(msg)
+
+        await handle_cancel(msg)
 
         ## mention
         if msg.role_mentions:
@@ -70,7 +86,7 @@ async def ask_role(ctx, question: str, *, timeout: float = 45.0, cleanup=None):
         await ctx.send("Couldn’t find that role.")
         return None
 
-    except TimeoutError:
+    except asyncio.TimeoutError:
         await ctx.send("No response.")
         return None
 
