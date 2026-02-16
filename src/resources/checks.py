@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import time
 
 import discord
 
@@ -13,11 +14,25 @@ async def is_admin(userID):
     return False
 
 
-async def is_blacklisted(userID):
-    if await bot.db.find_blacklist({"_id": str(userID)}) != None:
-        return True
-    else:
-        return False
+BLACKLIST_TTL = 300
+
+if not hasattr(bot, "blacklist_cache"):
+    bot.blacklist_cache = {}
+
+async def is_blacklisted(userID) -> bool:
+    userID = int(userID)
+    now = time.time()
+
+    cached = bot.blacklist_cache.get(userID)
+    if cached is not None:
+        value, ts = cached
+        if (now - ts) < BLACKLIST_TTL:
+            return value
+
+    doc = await bot.db.find_blacklist({"_id": str(userID)})
+    value = doc is not None
+    bot.blacklist_cache[userID] = (value, now)
+    return value
 
 
 async def validate_user(userID):
@@ -25,7 +40,7 @@ async def validate_user(userID):
     if userID == "0" or userID.isdigit() == False or len(userID) < 17:
         return None
     else:
-        return userID
+        return int(userID)
 
 
 # bot_central data
@@ -140,34 +155,51 @@ async def update_counter(guildID, item, new_value):
         {"_id": str(guildID)}, {"$set": {"settings." + "counter" + "." + item: new_value}}
     )
 
+SERVER_TTL = 300
 
-# server settings data
+if not hasattr(bot, "server_cache"):
+    bot.server_cache = {}  # guildID -> (data, ts)
+
 async def lookup_server(guildID):
-    data = await bot.db.find_user({"_id": str(guildID), f"settings.{"server"}": {"$exists": True}})
-    if data == None:
-        return False
-    else:
-        return data
+    now = time.time()
 
+    cached = bot.server_cache.get(guildID)
+    if cached is not None:
+        data, ts = cached
+        if (now - ts) < SERVER_TTL:
+            return data
+
+    data = await bot.db.find_user({"_id": str(guildID), "settings.server": {"$exists": True}})
+    if data is None:
+        return False
+
+    bot.server_cache[guildID] = (data, now)
+    return data
+
+def invalidate_server_cache(guildID: int):
+    bot.server_cache.pop(guildID, None)
 
 async def new_server(guildID):
     newGuild = {
         "IgnoredChannels": [],
         "IgnoredChannelDrops": [],
     }
-    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "server": {**newGuild}}})
-
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings.server": {**newGuild}}})
+    invalidate_server_cache(int(guildID))
 
 async def update_server(guildID, item, new_value):
-    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings." + "server" + "." + item: new_value}})
+    await bot.db.update_one({"_id": str(guildID)}, {"$set": {"settings.server." + item: new_value}})
+    invalidate_server_cache(int(guildID))
 
 
 async def update_ignored_drops(guildID, new_value: list):
     await bot.db.update_one(
         {"_id": str(guildID)}, {"$set": {"settings.server.IgnoredChannelDrops": new_value}}
     )
+    invalidate_server_cache(int(guildID))
 
 async def update_ignored_channels(guildID, new_value: list):
     await bot.db.update_one(
         {"_id": str(guildID)}, {"$set": {"settings.server.IgnoredChannels": new_value}}
     )
+    invalidate_server_cache(int(guildID))
