@@ -16,31 +16,36 @@ async def generate(ctx, userID = '0', amount = "0"):
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
         userID = await validate_user(userID)
+        if userID is None:
+            raise Exception("Invalid user, try again!")
 
-        if userID == None or guild.get_member(int(userID)) is None: raise Exception("Invalid user, try again!")
+        userID = int(userID)
+        userKey = str(userID)
+
+        if userID == None or guild.get_member(userID) is None: raise Exception("Invalid user, try again!")
         if await is_blacklisted(userID): raise Exception("Illegal activity! You can't generate for a blacklisted user!")
         if amount == "0": raise Exception("Invalid amount, try again!")
         
         amount = int(amount)
-        user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+        user = guild.get_member(userID) or await guild.fetch_member(userID)
 
         ## this block fetches user data from the database
         userData = await lookup_database(userID, guildID) 
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        userCookies = userData["users"][userID]["Cookies"] 
+        userCookies = userData["users"][userKey]["Cookies"] 
 
         ## bot admins bypass the checks
-        if await is_admin(ctx.author.id) == False:
+        '''if await is_admin(ctx.author.id) == False:
             if userCookies + amount < 0:
                 raise Exception("You can't put the user in a negative balance!")
             if amount > 300 or amount < -300:
                 raise Exception("You can't generate more/less than 300 cookies at a time.")
             else:
                 userCookies += amount
-        else:
-            userCookies += amount
+        else:'''
+        userCookies += amount
 
         ## send the embed
         give_embed = discord.Embed(
@@ -57,12 +62,12 @@ async def generate(ctx, userID = '0', amount = "0"):
         await ctx.send(embed=give_embed)
 
         ## update the database
-        await update_value(userID, guildID, "Cookies", userCookies)
+        await update_value(userKey, guildID, "Cookies", userCookies)
 
     except ValueError:
         await ctx.send("Invalid amount, try again!")
     except Exception as Error:
-        await ctx.send(Error)
+        await ctx.send(f"`{type(Error).__name__}`: {Error}")
 
 @generate.error
 async def on_command_error(ctx: commands.Context, error: commands.CommandError):
