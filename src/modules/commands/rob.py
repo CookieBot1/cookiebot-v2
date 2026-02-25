@@ -44,7 +44,7 @@ async def rob(ctx, userID="0"):
             userID = await validate_user(userID)
             if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id:
                 raise Exception("Invalid user, try again!")
-            if await is_blacklisted(userID):
+            if await is_blacklisted(int(userID)):
                 raise Exception("Unable to rob, that user is blacklisted.")
             
             ## checks for the user being robbed
@@ -55,8 +55,8 @@ async def rob(ctx, userID="0"):
             
         ## find a random user from database
         else:
-            database_users: dict = guild_data["users"]
-            database_users.pop(str(sender_id))
+            database_users = dict(guild_data["users"])
+            database_users.pop(str(sender_id), None)
             database_users = list(database_users.keys())
 
             if not database_users:
@@ -76,22 +76,21 @@ async def rob(ctx, userID="0"):
             
             if user_found == False:
                 raise Exception("No other user has enough cookies! 😶")
-        userID = str(userID)
-        user_cookies = user_data["users"][userID]["Cookies"]
-        user_rob_prot = user_data["users"][userID]["RobProtection"]
-        user_rob_chances = user_data["users"][userID]["RobChances"]  # likelihood target user is to be robbed
+        userID = int(userID)
+        userKey = str(userID)
+        senderKey = str(sender_id)
+
+        user_cookies = user_data["users"][userKey]["Cookies"]
+        user_rob_prot = user_data["users"][userKey]["RobProtection"]
+        user_rob_chances = user_data["users"][userKey]["RobChances"]  # likelihood target user is to be robbed
 
         ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
-        user = user_data["users"].get(userID, {})
-        rob_count = user.get("RobCount")
-        rob_gains = user.get("RobGains")
+        sender_user = guild_data["users"].get(senderKey, {})
+        rob_count = sender_user.get("RobCount")
+        rob_gains = sender_user.get("RobGains")
 
-        if rob_count is None or rob_gains is None:
-            user_rob_count = 0
-            user_rob_gains = 0
-        else:
-            user_rob_count = rob_count
-            user_rob_gains = rob_gains
+        sender_rob_count = 0 if rob_count is None else int(rob_count)
+        sender_rob_gains = 0 if rob_gains is None else int(rob_gains)
         ## ------------------------------------------------------------
 
         ## user checks
@@ -110,7 +109,7 @@ async def rob(ctx, userID="0"):
         embed_color = None
 
         ## update user rob stats
-        user_rob_count += 1
+        sender_rob_count += 1
 
         if random_num > user_rob_chances:
             # success
@@ -131,14 +130,14 @@ async def rob(ctx, userID="0"):
 
             # Make it more difficult to rob the user again + remove cookies
             await update_many_values(
-                userID,
+                userKey,
                 guild_id,
                 Cookies=user_cookies - stolen_cookies,
                 RobChances=urc if (urc := user_rob_chances + 0.2) < 11 else 11,
             )
             await update_value(sender_id, guild_id, "Cookies", sender_cookies + stolen_cookies)
-            user_rob_gains += stolen_cookies
-            await update_value(sender_id, guild_id, "RobGains", user_rob_gains)
+            sender_rob_gains += stolen_cookies
+            await update_value(sender_id, guild_id, "RobGains", sender_rob_gains)
 
         else:
             # fail
@@ -170,7 +169,7 @@ async def rob(ctx, userID="0"):
 
             # Make it easier to rob user until we reach the base count again
             await update_many_values(
-                userID,
+                userKey,
                 guild_id,
                 RobChances=urc if (urc := user_rob_chances - 0.2) > 7 else 7,
                 Cookies=user_cookies,
@@ -178,7 +177,7 @@ async def rob(ctx, userID="0"):
 
         cooldown = datetime.now() + timedelta(hours=4)
         await update_value(sender_id, guild_id, "RobExpire", cooldown)
-        await update_value(sender_id, guild_id, "RobCount", user_rob_count)
+        await update_value(sender_id, guild_id, "RobCount", sender_rob_count)
 
         embed = discord.Embed(color=embed_color, description=embed_desc)
         embed.set_author(name=embed_title, icon_url=sender.display_avatar)
