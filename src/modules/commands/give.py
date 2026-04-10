@@ -6,6 +6,9 @@ from resources.checks import lookup_database, new_database, update_value, is_bla
 @bot.command(aliases = ["transfer", "send"])
 async def give(ctx, userID = '0', amount = "0"):
     try:
+        disabled = True
+        if disabled: raise Exception("This command is currently disabled, try again later!")
+
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
         userID = await validate_user(userID)
