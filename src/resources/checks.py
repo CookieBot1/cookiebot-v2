@@ -105,7 +105,8 @@ async def new_database(userID, guildID):
             "readId": None,
             "pingForId": None,
             "pingCount": 0
-        }
+        },
+        "Married": 0
     }
     await bot.db.update_one({"_id": str(guildID)}, {"$set": {"users." + str(userID): {**newUser}}})
 
