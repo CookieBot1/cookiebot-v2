@@ -52,7 +52,6 @@ async def profile(ctx, userID = '0'):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
         userRobChances = userData["users"][userID]["RobChances"]
-        userMarried = userData["users"][userID]["Married"]
         rob_pct = int(round(float(userRobChances) * 10))
 
 
@@ -61,9 +60,11 @@ async def profile(ctx, userID = '0'):
 
         rob_count = userThing.get("RobCount")
         rob_gains = userThing.get("RobGains")
+        marriedStatus = userThing.get("Married")
         userProfileColor = userThing.get("ProfileColor")
         userProfileBio = userThing.get("Bio")
 
+        userMarried = 0 if marriedStatus is None else int(marriedStatus)
         userRobCount = 0 if rob_count is None else int(rob_count)
         userRobGains = 0 if rob_gains is None else int(rob_gains)
         userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
@@ -145,17 +146,18 @@ async def profile(ctx, userID = '0'):
             stats_embed.set_author(name = badges_line)
         
         # about section
-        married_line = ""
+        desc = ""
 
         # MARRIED status section
-        if userMarried:
+        if userMarried != 0:
             try:
                 partner = guild.get_member(int(userMarried)) or await guild.fetch_member(int(userMarried))
-                married_line = f"💍 **Married to:** {partner.mention}\n"
+                desc += f"💍 **Married to:** {partner.mention}\n\n"
             except:
-                married_line = "💍 **Married to:** Unknown\n"
+                desc += "💍 **Married to:** Unknown\n\n"
 
-        stats_embed.description = f"**About:**\n{about}"
+        desc += f"**About:**\n{about}"
+        stats_embed.description = desc
 
         if profile_opts.get("Cookies", True):
             rank_value = f"#{this_user.position}" if this_user else "Unranked"
