@@ -52,6 +52,7 @@ async def profile(ctx, userID = '0'):
         userCounter = userData["users"][userID]["Counter"]
         userFailCounter = userData["users"][userID]["FailCounter"]
         userRobChances = userData["users"][userID]["RobChances"]
+        userMarried = userData["users"][userID]["Married"]
         rob_pct = int(round(float(userRobChances) * 10))
 
 
@@ -142,7 +143,18 @@ async def profile(ctx, userID = '0'):
 
         if badges_line != None:
             stats_embed.set_author(name = badges_line)
+        
         # about section
+        married_line = ""
+
+        # MARRIED status section
+        if userMarried:
+            try:
+                partner = guild.get_member(int(userMarried)) or await guild.fetch_member(int(userMarried))
+                married_line = f"💍 **Married to:** {partner.mention}\n"
+            except:
+                married_line = "💍 **Married to:** Unknown\n"
+
         stats_embed.description = f"**About:**\n{about}"
 
         if profile_opts.get("Cookies", True):
