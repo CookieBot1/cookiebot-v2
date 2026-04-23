@@ -3,6 +3,8 @@ import discord
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
 
+## ASK IF USER WANTS TO ACC GET MARRIED!!
+
 @bot.command()
 async def marry(ctx, user: discord.Member):
     try:
@@ -24,12 +26,21 @@ async def marry(ctx, user: discord.Member):
         if await is_blacklisted(userID):
             raise Exception("Illegal activity! You can't marry a blacklisted user!")
 
+        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO Married field, REMOVE LATER!!!!!!
+        userThing = userData["users"].get(userID, {})
+
+        userStatus = userThing.get("Married")
+        senderStatus = userThing.get("Married")
+
+        userMarried = 0 if userStatus is None else int(userStatus)
+        senderMarried = 0 if senderStatus is None else int(senderStatus)
+        ## ------------------------------------------------------------
+
         ## fetching userData
         userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        userMarried = userData["users"][userID]["Married"]
 
         if userMarried != 0:
             raise Exception("This user is already married!")
@@ -39,7 +50,6 @@ async def marry(ctx, user: discord.Member):
         if senderData == False:
             await new_database(senderID, guildID)
             senderData = await lookup_database(senderID, guildID)
-        senderMarried = senderData["users"][senderID]["Married"]
 
         if senderMarried != 0:
             raise Exception("You are already married!")
