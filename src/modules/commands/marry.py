@@ -1,4 +1,5 @@
 from resources.mrcookie import instance as bot
+import discord
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
 
@@ -15,13 +16,13 @@ async def marry(ctx, user: discord.Member):
 
         ## validation
         if user.id == ctx.author.id:
-            raise Exception("Invalid user, you can't give cookies to yourself!")
+            raise Exception("Invalid user, you can't marry yourself!")
 
         if guild.get_member(int(userID)) is None:
             raise Exception("Invalid user, try again!")
 
         if await is_blacklisted(userID):
-            raise Exception("Illegal activity! You can't give to a blacklisted user!")
+            raise Exception("Illegal activity! You can't marry a blacklisted user!")
 
         ## fetching userData
         userData = await lookup_database(userID, guildID)
