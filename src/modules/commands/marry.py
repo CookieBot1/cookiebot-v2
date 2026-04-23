@@ -3,7 +3,7 @@ from resources.mrcookie import instance as bot
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
 
 @bot.command()
-async def marry(ctx, userID = '0'):
+async def marry(ctx, user: discord.Member):
     try:
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
