@@ -26,39 +26,39 @@ async def marry(ctx, user: discord.Member):
         if await is_blacklisted(userID):
             raise Exception("Illegal activity! You can't marry a blacklisted user!")
 
-        ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO Married field, REMOVE LATER!!!!!!
-        userThing = userData["users"].get(userID, {})
 
-        userStatus = userThing.get("Married")
-        senderStatus = userThing.get("Married")
-
-        userMarried = 0 if userStatus is None else int(userStatus)
-        senderMarried = 0 if senderStatus is None else int(senderStatus)
-        ## ------------------------------------------------------------
-
-        ## fetching userData
         userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
 
-        if userMarried != 0:
-            raise Exception("This user is already married!")
-
-        ## fetching senderData
         senderData = await lookup_database(senderID, guildID)
         if senderData == False:
             await new_database(senderID, guildID)
             senderData = await lookup_database(senderID, guildID)
 
+        ## db check
+        userThing = userData["users"].get(userID, {})
+        senderThing = senderData["users"].get(senderID, {})
+
+        userStatus = userThing.get("Married")
+        senderStatus = senderThing.get("Married")
+
+        userMarried = 0 if userStatus is None else int(userStatus)
+        senderMarried = 0 if senderStatus is None else int(senderStatus)
+
+        ## checks
+        if userMarried != 0:
+            raise Exception("This user is already married!")
+
         if senderMarried != 0:
             raise Exception("You are already married!")
 
-        ## marry the users
+        ## marry them
         userMarried = senderID
         senderMarried = userID
 
-        ## send the embed
+        ## embed
         marry_embed = discord.Embed(
             title="💍 Marrying " + user.display_name + "..",
             description=f"{sender.mention} and {user.mention} are now **MARRIED**!",
@@ -66,7 +66,7 @@ async def marry(ctx, user: discord.Member):
         )
         await ctx.send(embed=marry_embed)
 
-        ## update the db
+        ## update db
         await update_value(userID, guildID, "Married", userMarried)
         await update_value(senderID, guildID, "Married", senderMarried)
 
