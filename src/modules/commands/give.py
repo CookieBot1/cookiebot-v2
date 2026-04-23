@@ -6,9 +6,6 @@ from resources.checks import lookup_database, new_database, update_value, is_bla
 @bot.command(aliases = ["transfer", "send"])
 async def give(ctx, userID = '0', amount = "0"):
     try:
-        disabled = True
-        if disabled: raise Exception("This command is currently disabled, try again later!")
-
         guildID = ctx.guild.id
         guild = ctx.bot.get_guild(guildID)
         userID = await validate_user(userID)
@@ -27,7 +24,7 @@ async def give(ctx, userID = '0', amount = "0"):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        userCookies = userData["users"][senderID]["Cookies"]
+        userCookies = userData["users"][userID]["Cookies"]
 
         ## fetching senderData
         senderData = await lookup_database(senderID, guildID) 
@@ -37,7 +34,7 @@ async def give(ctx, userID = '0', amount = "0"):
         senderCookies = senderData["users"][senderID]["Cookies"]
 
         ## check if sender has enough cookies
-        if userCookies < amount: raise Exception("Ahem- you don't have that many cookies..")
+        if senderCookies < amount: raise Exception("Ahem- you don't have that many cookies..")
         
         ## transfer the cookies
         userCookies += amount
