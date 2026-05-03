@@ -145,24 +145,26 @@ async def profile(ctx, userID = '0'):
         if badges_line != None:
             stats_embed.set_author(name = badges_line)
         
-        # about section
+        ## about section
         desc = ""
 
-        # MARRIED status section
+        ## MARRIED status section
         if userMarried != 0:
             try:
                 partner = guild.get_member(int(userMarried)) or await guild.fetch_member(int(userMarried))
                 desc += f"💍 **Married to:** {partner.mention}\n\n"
             except:
                 desc += "💍 **Married to:** Unknown\n"
+            cookieTitle = "🍪 Personal Cookies"
+        else:
+            cookieTitle = "🍪 Cookies"
 
         desc += f"**About:**\n{about}"
         stats_embed.description = desc
 
         if profile_opts.get("Cookies", True):
             rank_value = f"#{this_user.position}" if this_user else "Unranked"
-            ##sections.append(("🍪 Cookies", f"**Cookies**: {fmt_int(userCookies)}\n**Rank**: {rank_value}"))
-            sections.append(("🍪 Cookies", f"**{fmt_int(userCookies)}** Cookies\n**Rank** {rank_value}"))
+            sections.append((cookieTitle, f"**{fmt_int(userCookies)}** Cookies\n**Rank** {rank_value}"))
 
         if profile_opts.get("Streaks", True):
             day_term = "Day" if int(userStreaks) == 1 else "Days"
