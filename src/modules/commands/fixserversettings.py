@@ -1,6 +1,8 @@
 from resources.mrcookie import instance as bot
 from discord.ext import commands
 
+from resources.checks import is_admin
+
 
 def default_settings():
     return {
@@ -25,6 +27,8 @@ def default_settings():
 @bot.command()
 @commands.is_owner()
 async def fixserversettings(ctx):
+    if await is_admin(ctx.author.id) == False: raise Exception("You don't have permission to run this command.")
+
     await ctx.send("Fixing missing server settings...")
 
     guilds = await bot.db.get_guilds()
