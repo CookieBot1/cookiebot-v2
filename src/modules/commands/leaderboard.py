@@ -191,9 +191,33 @@ async def page_buttons(interaction: discord.Interaction, view: discord.ui.View |
 
 async def build_embed(guild_users: dict, author_id: str, lbtype: str, page_num: int = 0) -> discord.Embed:
     if lbtype == "cookies":
-        simplified_users: list[SimpleUser] = [
-            SimpleUser(uid, data["Cookies"], lbtype=lbtype) for uid, data in guild_users.items()
-        ]
+        simplified_users = []
+        already_counted = set()
+
+        for uid, data in guild_users.items():
+            if uid in already_counted:
+                continue
+
+            cookies = data.get("Cookies", 0)
+            married_id = data.get("Married")
+
+            if married_id is not None and int(married_id) != 0:
+                married_id = str(married_id)
+
+                if married_id in guild_users:
+                    cookies += guild_users[married_id].get("Cookies", 0)
+                    already_counted.add(married_id)
+
+                rank_id = uid
+            else:
+                rank_id = uid
+
+            already_counted.add(uid)
+
+            simplified_users.append(
+                SimpleUser(rank_id, cookies, lbtype=lbtype)
+            )
+
     elif lbtype == "count":
         simplified_users: list[SimpleUser] = [
             SimpleUser(uid, data["Counter"], lbtype=lbtype) for uid, data in guild_users.items()
