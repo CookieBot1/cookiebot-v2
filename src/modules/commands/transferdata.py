@@ -1,9 +1,6 @@
 from resources.mrcookie import instance as bot
 from discord.ext import commands
 
-old_col = bot.db.cookieDict
-new_col = bot.db.master_data
-
 
 def default_user_data():
     return {
@@ -15,13 +12,13 @@ def default_user_data():
         "RobExpire": None,
         "RobChances": 7,
         "RobProtection": None,
+        "RobCount": 0,
+        "RobGains": 0,
         "Counter": 0,
+        "CountSaves": 0,
         "FailCounter": 0,
         "Inventory": "Empty",
-        "RobGains": 0,
-        "RobCount": 0,
-        "Bio": "",
-        "ProfileColor": 65535,
+        "Bio": "No bio set. Run ``.customize profile`` to set one!",
         "ProfileOptions": {
             "Cookies": True,
             "Streaks": True,
@@ -29,13 +26,14 @@ def default_user_data():
             "Robbery": True,
             "Inventory": False
         },
+        "ProfileColor": 0x7289da,
         "DevAlerts": True,
         "AlertState": {
             "readId": None,
             "pingForId": None,
             "pingCount": 0
         },
-        "Married": None
+        "Married": 0
     }
 
 
@@ -48,11 +46,13 @@ async def transferdata(ctx):
     user_count = 0
     beta_bonus_count = 0
 
-    for old_server in old_col.find({}):
-        serverID = str(old_server["_id"])
+    old_servers = await bot.db.get_old_guilds()
+
+    for old_server in old_servers:
+        guildID = str(old_server["_id"])
         old_users = old_server.get("users", {})
 
-        new_server = new_col.find_one({"_id": serverID}) or {}
+        new_server = await bot.db.find_user({"_id": guildID}) or {}
         new_users = new_server.get("users", {})
 
         for userID, old_data in old_users.items():
@@ -68,21 +68,20 @@ async def transferdata(ctx):
             merged_data = default_user_data()
             merged_data.update(current_data)
 
-            # Old cookies replace new cookies.
-            # If user already had cookies in master_data, add beta bonus.
+            # Transfer old cookies.
+            # If they already had cookies in master_data, add beta bonus.
             if current_cookies > 0:
                 merged_data["Cookies"] = old_cookies + 1000
                 beta_bonus_count += 1
             else:
                 merged_data["Cookies"] = old_cookies
 
-            # Keep whichever streak value is higher.
+            # Use whichever streak is higher.
             merged_data["Streaks"] = max(old_streaks, current_streaks)
 
-            new_col.update_one(
-                {"_id": serverID},
-                {"$set": {f"users.{userID}": merged_data}},
-                upsert=True
+            await bot.db.update_one(
+                {"_id": guildID},
+                {"$set": {f"users.{userID}": merged_data}}
             )
 
             user_count += 1
