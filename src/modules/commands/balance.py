@@ -62,7 +62,7 @@ async def balance(ctx, userID = '0'):
 
         ## check if married
         if userMarried != 0:
-            embed_title = f"{user.display_name} & {bot.get_user(userMarried).display_name}'s Cookie Balance"
+            embed_title = f"💍 {user.display_name} & {bot.get_user(userMarried).display_name}'s Cookie Balance"
             marriedCookies = userData["users"][str(userMarried)]["Cookies"]
             userCookies = userCookies + marriedCookies
         else:
@@ -82,7 +82,7 @@ async def balance(ctx, userID = '0'):
 
             if married_id is not None and int(married_id) != 0:
                 married_id = str(married_id)
-                
+
                 if married_id in guild_users:
                     cookies += guild_users[married_id].get("Cookies", 0)
                     already_counted.add(married_id)
