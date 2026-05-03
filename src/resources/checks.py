@@ -100,7 +100,7 @@ async def new_database(userID, guildID):
         "Bio": "No bio set. Run ``.customize profile`` to set one!",
         "ProfileOptions": {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False},
         "ProfileColor": 0x7289da,
-        "DevAlerts": False,
+        "DevAlerts": True,
         "AlertState": {
             "readId": None,
             "pingForId": None,
