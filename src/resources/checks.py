@@ -129,7 +129,7 @@ async def update_many_values(userID, guildID, **kwargs):
 
 # counter data
 async def lookup_counter(guildID):
-    data = await bot.db.find_user({"_id": str(guildID), f"settings.{"counter"}": {"$exists": True}})
+    data = await bot.db.find_user({"_id": str(guildID), "settings.counter": {"$exists": True}})
     if data == None:
         return False
     else:
