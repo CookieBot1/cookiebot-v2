@@ -1,7 +1,7 @@
 from resources.mrcookie import instance as bot
 from discord.ext import commands
 
-from resources.constants import ADMIN_USERS
+from resources.checks import is_admin
 
 
 def default_user_data():
