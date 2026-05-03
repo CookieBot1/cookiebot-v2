@@ -21,11 +21,17 @@ class SimpleUser:
     cookies: int
     lbtype: str = field(default="cookies", kw_only=True)
     position: Optional[int] = field(default=0, kw_only=True)
+    display_name: Optional[str] = field(default=None, kw_only=True)
 
     async def lb_output(self) -> str:
-        user = bot.get_user(int(self.uid)) or await bot.fetch_user(int(self.uid))
-        if user.global_name == None: lb_user = user.name
-        else: lb_user = user.global_name
+        if self.display_name:
+            lb_user = self.display_name
+        else:
+            user = bot.get_user(int(self.uid)) or await bot.fetch_user(int(self.uid))
+            if user.global_name == None:
+                lb_user = user.name
+            else:
+                lb_user = user.global_name
 
         label_map = {
             "cookies": "Cookie",
@@ -214,8 +220,23 @@ async def build_embed(guild_users: dict, author_id: str, lbtype: str, page_num: 
 
             already_counted.add(uid)
 
+            # build display name
+            user_obj = bot.get_user(int(uid))
+            user_name = user_obj.global_name if user_obj and user_obj.global_name else user_obj.name if user_obj else "Unknown"
+
+            if married_id is not None and int(married_id) != 0 and married_id in guild_users:
+                married_obj = bot.get_user(int(married_id))
+                married_name = (
+                    married_obj.global_name if married_obj and married_obj.global_name
+                    else married_obj.name if married_obj else "Unknown"
+                )
+
+                display_name = f"{user_name} & {married_name}"
+            else:
+                display_name = user_name
+
             simplified_users.append(
-                SimpleUser(rank_id, cookies, lbtype=lbtype)
+                SimpleUser(uid, cookies, lbtype=lbtype, display_name=display_name)
             )
 
     elif lbtype == "count":
