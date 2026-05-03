@@ -152,7 +152,7 @@ async def profile(ctx, userID = '0'):
         if userMarried != 0:
             try:
                 partner = guild.get_member(int(userMarried)) or await guild.fetch_member(int(userMarried))
-                desc += f"💍 **Married to:** {partner.mention}\n"
+                desc += f"💍 **Married to:** {partner.mention}\n\n"
             except:
                 desc += "💍 **Married to:** Unknown\n"
 
