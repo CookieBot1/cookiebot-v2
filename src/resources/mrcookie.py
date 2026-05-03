@@ -92,6 +92,12 @@ class MongoDB:
         return document
     async def update_old_one(self, dict, set):
         await self.db.cookieDict.update_one(dict, set, upsert=True)
+
+
+    async def get_old_guilds(self):
+        cursor = self.db.cookieDict.find({})
+        documents = await cursor.to_list(None)
+        return documents
     ##---------------
     
 
