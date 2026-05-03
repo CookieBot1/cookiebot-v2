@@ -40,6 +40,8 @@ def default_user_data():
 @bot.command()
 @commands.is_owner()
 async def transferdata(ctx):
+    if await is_admin(ctx.author.id) == False: raise Exception("You don't have permission to run this command.")
+
     await ctx.send("Starting data transfer...")
 
     server_count = 0
