@@ -1,3 +1,9 @@
+from resources.mrcookie import instance as bot
+import discord
+from discord.ext import commands
+
+from resources.checks import lookup_database, new_database, update_value, is_blacklisted
+
 class DivorceView(discord.ui.View):
     def __init__(self, user):
         super().__init__(timeout=30)
