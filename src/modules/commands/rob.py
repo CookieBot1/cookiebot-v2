@@ -31,8 +31,9 @@ async def rob(ctx, userID="0"):
             guild_data = await lookup_database(sender_id, guild_id)
 
         sender_cookies = guild_data["users"].get(str(sender_id), {}).get("Cookies", 0)
-        sender_rob_cooldown = guild_data["users"].get(str(sender_id), {}).get("RobExpire", datetime.now())
-
+        sender_rob_cooldown = (
+            guild_data["users"].get(str(sender_id), {}).get("RobExpire") or datetime.now()
+        )
         ## sender checks
         if sender_cookies < 15:
             raise Exception("Whoops, you need at least 15 cookies to rob someone!")
@@ -81,7 +82,7 @@ async def rob(ctx, userID="0"):
         senderKey = str(sender_id)
 
         user_cookies = user_data["users"][userKey]["Cookies"]
-        user_rob_prot = user_data["users"][userKey]["RobProtection"]
+        user_rob_prot = user_data["users"][userKey].get("RobProtection") or datetime.now()
         user_rob_chances = user_data["users"][userKey]["RobChances"]  # likelihood target user is to be robbed
 
         ## THIS IS TEMPORARY SINCE OLD DB MIGHT HAVE NO RobCount/RobGains, REMOVE LATER!!!!!!
