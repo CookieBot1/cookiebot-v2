@@ -1,11 +1,40 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord.ext import commands
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
 
-## ASK IF USER WANTS TO ACC GET MARRIED!!
 
-@bot.command()
+class MarriageView(discord.ui.View):
+    def __init__(self, user):
+        super().__init__(timeout=30)
+        self.user = user
+        self.accepted = None
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message(
+                "This proposal is not for you!",
+                ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green, emoji="💍")
+    async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.accepted = True
+        await interaction.response.defer()
+        self.stop()
+
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.red, emoji="💔")
+    async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.accepted = False
+        await interaction.response.defer()
+        self.stop()
+
+
+@bot.command(aliases=['propose'])
+@commands.cooldown(1, 60, commands.BucketType.user)
 async def marry(ctx, user: discord.Member):
     try:
         guildID = ctx.guild.id
@@ -25,7 +54,6 @@ async def marry(ctx, user: discord.Member):
 
         if await is_blacklisted(userID):
             raise Exception("Illegal activity! You can't marry a blacklisted user!")
-
 
         userData = await lookup_database(userID, guildID)
         if userData == False:
@@ -54,6 +82,30 @@ async def marry(ctx, user: discord.Member):
         if senderMarried != 0:
             raise Exception("You are already married!")
 
+        ## ask user first
+        view = MarriageView(user)
+
+        proposal_embed = discord.Embed(
+            title="💍 Marriage Proposal",
+            description=f"{user.mention}, {sender.mention} wants to marry you!\n\nDo you accept?",
+            color=0xf1c40f
+        )
+
+        proposal_message = await ctx.send(embed=proposal_embed, view=view)
+
+        await view.wait()
+
+        try:
+            await proposal_message.delete()
+        except:
+            pass
+
+        if view.accepted is None:
+            return await ctx.send("⏰ Marriage proposal timed out!")
+
+        if view.accepted == False:
+            return await ctx.send("💔 Marriage proposal declined.")
+
         ## marry them
         userMarried = senderID
         senderMarried = userID
@@ -72,3 +124,11 @@ async def marry(ctx, user: discord.Member):
 
     except Exception as Error:
         await ctx.send(str(Error))
+
+
+@marry.error
+async def marry_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"Slow down! Try again in **{round(error.retry_after)} seconds**.")
+    else:
+        await ctx.send(f"An error occurred: {str(error)}")
