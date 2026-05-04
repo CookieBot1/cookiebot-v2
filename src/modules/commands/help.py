@@ -18,11 +18,12 @@ async def help(ctx, category = "general"):
             "cookie": "cookies",
             "statistics": "stats",
             "stat": "stats",
+            "social": "fun",
         }
         category = aliases.get(category, category)
-        if category not in ["general", "info", "settings", "counter", "cookies", "stats"]:
+        if category not in ["general", "info", "settings", "counter", "cookies", "stats", "fun"]:
             return await ctx.reply(
-                "Invalid help type! Please use: `general`, `info`, `settings`, `counter`, `cookies`, `stats`.",
+                "Invalid help type! Please use: `general`, `info`, `settings`, `counter`, `cookies`, `stats`, `fun`.",
                 delete_after=7
             )
 
@@ -55,6 +56,10 @@ async def help(ctx, category = "general"):
             help_embed.add_field(name = "📈 Stats", value =
             "View fun statistics about the server and users!" + "\n" +
             "``.profile`` ``.customize`` ``.leaderboard`` ``.balance`` ``.stats``", inline = False)
+
+            help_embed.add_field(name = "🎱 Fun", value =
+            "All the fun and social commands for the server!" + "\n" +
+            "``.marry`` ``.divorce``", inline = False)
 
             help_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=help_embed)
@@ -223,6 +228,28 @@ async def help(ctx, category = "general"):
 
             stats_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
             await ctx.send(embed=stats_embed)
+
+        if category == "fun":
+            # send the fun embed
+            fun_embed = discord.Embed(
+                description = "All the fun and social commands for the server!",
+                color = 0x9b59b6,
+                )
     
+            # title and profile icon
+            fun_embed.set_author(name = "Fun Help Page", icon_url = ctx.bot.user.avatar)
+
+            fun_embed.add_field(name = "🔹 Marry", value = 
+            "Marry another user in the server." + "\n" +
+            "Usage: ``.marry (user)``" + "\n" +
+            "``user`` can be a mention or user ID.", inline = False)
+
+            fun_embed.add_field(name = "🔹 Divorce", value = 
+            "Divorce your current spouse." + "\n" +
+            "Usage: ``.divorce``", inline = False)
+
+            fun_embed.set_footer(text = "Need help? Join our server: https://discord.gg/QVNAyWfVsG")
+            await ctx.send(embed=fun_embed)
+
     except Exception as Error:
         await ctx.send(Error)
