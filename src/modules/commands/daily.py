@@ -50,11 +50,22 @@ async def daily(ctx):
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
-        userCookies = userData["users"][userID]["Cookies"]
-        userStreaks = userData["users"][userID]["Streaks"]
-        userDailyMultiplier = userData["users"][userID]["DailyMultiplier"]
-        userMultExpire = userData["users"][userID]["DailyMultExpire"]
-        userDailyExpire = userData["users"][userID]["DailyExpire"]
+
+
+        dbUser = userData["users"][userID]
+
+        userCookies = dbUser.get("Cookies", 0)
+        userStreaks = dbUser.get("Streaks", 0)
+        userDailyMultiplier = dbUser.get("DailyMultiplier", 0)
+
+        userMultExpire = dbUser.get("DailyMultExpire")
+        if userMultExpire is None:
+            userMultExpire = datetime.now() - timedelta(days=1)
+
+        userDailyExpire = dbUser.get("DailyExpire")
+        if userDailyExpire is None:
+            userDailyExpire = datetime.now() - timedelta(days=1)
+        
 
         ## this checks if they have a cooldown
         if datetime.now() < userDailyExpire:
@@ -62,9 +73,11 @@ async def daily(ctx):
 
             cooldown_embed = discord.Embed(
                 description = "You can collect your cookies again " + "<t:" + str(timer) + ":R>",
-                color = 0x992d22,
-                timestamp = userDailyExpire
-                )
+                color = 0x992d22
+            )
+            cooldown_embed.set_footer(
+                text = "Tomorrow at " + userDailyExpire.strftime("%I:%M %p")
+            )   
             cooldown_embed.set_author(name = "Not yet " + str(user.display_name) + "!", icon_url = user.display_avatar)
             await ctx.send(embed=cooldown_embed)
             return
@@ -73,9 +86,12 @@ async def daily(ctx):
         BaseCookies = 15
         Multiplier = 0
         StreakCookies = int((userStreaks/14) * 1.5)
+
         if userDailyMultiplier > 0:
-            if userMultExpire >= datetime.now(): Multiplier = userDailyMultiplier
-            else: userDailyMultiplier = 0
+            if userMultExpire and userMultExpire >= datetime.now():
+                Multiplier = userDailyMultiplier
+            else:
+                userDailyMultiplier = 0
         
         Temp = (BaseCookies + StreakCookies) * Multiplier
         TotalCookies = BaseCookies + StreakCookies + Temp
