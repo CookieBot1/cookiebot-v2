@@ -34,7 +34,7 @@ class MarriageView(discord.ui.View):
 
 
 @bot.command(aliases=['propose'])
-@commands.cooldown(1, 30, commands.BucketType.user)
+@commands.cooldown(1, 15, commands.BucketType.user)
 async def marry(ctx, user: discord.Member):
     try:
         guildID = ctx.guild.id
