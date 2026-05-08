@@ -19,6 +19,10 @@ from resources.mrcookie import instance as bot
 @bot.command(aliases=["steal", "mug"])
 async def rob(ctx, userID="0"):
     try:
+        if ctx.author.id == 846544080111665182:
+            raise Exception("HELP.. BOT SELF DESTRUCTING.. AHHHHHHH HELHELPEP LETJIGSIGJRDBIFD IM DYINGGGG AHHHHHHHHH *DIES*")
+
+
         guild_id = ctx.guild.id
         guild = ctx.bot.get_guild(guild_id)
         sender_id = ctx.author.id
