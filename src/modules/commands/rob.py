@@ -45,7 +45,7 @@ async def rob(ctx, userID="0"):
             await ctx.send("Omg bellita.. are you trying to rob someone.. 🥺")
             await ctx.send("But MAMAAA I'm in love with a CRIMINALLLL-")
             await ctx.send("And this type of love isn't rational.. it's ❤️ PHYSICALLL ❤️")
-            await ctx.send("All reason aside I just can't deny, I love the bellaaaaaa")
+            await ctx.send("https://tenor.com/view/meme-milk-gif-6919750708092698197")
 
 
         ## validate the pinged user, if any. if empty user parameter, get random user from database
