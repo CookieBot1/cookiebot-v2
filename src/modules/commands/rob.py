@@ -19,10 +19,6 @@ from resources.mrcookie import instance as bot
 @bot.command(aliases=["steal", "mug"])
 async def rob(ctx, userID="0"):
     try:
-        if ctx.author.id == 846544080111665182:
-            raise Exception("HELP.. BOT SELF DESTRUCTING.. AHHHHHHH HELHELPEP LETJIGSIGJRDBIFD IM DYINGGGG AHHHHHHHHH *DIES*")
-
-
         guild_id = ctx.guild.id
         guild = ctx.bot.get_guild(guild_id)
         sender_id = ctx.author.id
@@ -43,6 +39,14 @@ async def rob(ctx, userID="0"):
             raise Exception("Whoops, you need at least 15 cookies to rob someone!")
         if sender_rob_cooldown > datetime.now():
             raise ValueError()
+
+        ## custom bella code
+        if ctx.author.id == 846544080111665182:
+            await ctx.send("Omg bellita.. are you trying to rob someone.. 🥺")
+            await ctx.send("But MAMAAA I'm in love with a CRIMINALLLL-")
+            await ctx.send("And this type of love isn't rational.. it's ❤️ PHYSICALLL ❤️")
+            await ctx.send("All reason aside I just can't deny, I love the bellaaaaaa")
+
 
         ## validate the pinged user, if any. if empty user parameter, get random user from database
         if userID != "0":
