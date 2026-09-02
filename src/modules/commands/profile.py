@@ -5,6 +5,8 @@ from attrs import define, field
 
 from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
 
+BELLA_ID = 846544080111665182
+
 @define()
 class SimpleUser:
     uid: str
@@ -65,6 +67,11 @@ async def profile(ctx, userID = '0'):
         userProfileBio = userThing.get("Bio")
 
         userMarried = 0 if marriedStatus is None else int(marriedStatus)
+
+        ## Bella profile detection
+        is_bella = int(userID) == BELLA_ID
+        is_bella_partner = userMarried == BELLA_ID
+
         userRobCount = 0 if rob_count is None else int(rob_count)
         userRobGains = 0 if rob_gains is None else int(rob_gains)
         userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
@@ -123,10 +130,21 @@ async def profile(ctx, userID = '0'):
 
         badges_line = " ".join(badges) if badges else None
 
-        ## build the embed
+        if is_bella:
+            profile_title = "🦋 Bella's Profile 💜"
+            profile_color = 0x9B59B6
+
+        elif is_bella_partner:
+            profile_title = f"💜 {member.display_name}'s Profile"
+            profile_color = 0x9B59B6
+
+        else:
+            profile_title = f"{member.display_name}'s Profile"
+            profile_color = userProfileColor
+
         stats_embed = discord.Embed(
-            title = f"{member.display_name}'s Profile",
-            color = userProfileColor,
+            title=profile_title,
+            color=profile_color,
         )
 
         default_opts = {"Cookies": True, "Streaks": True, "Counting": True, "Robbery": True, "Inventory": False}
@@ -152,7 +170,16 @@ async def profile(ctx, userID = '0'):
         if userMarried != 0:
             try:
                 partner = guild.get_member(int(userMarried)) or await guild.fetch_member(int(userMarried))
-                desc += f"💍 **Married to:** {partner.mention}\n\n"
+
+                if is_bella:
+                    desc += f"💜 **Her Johnny:** {partner.mention}\n\n"
+
+                elif is_bella_partner:
+                    desc += f"💜 **His Bellita:** {partner.mention}\n\n"
+
+                else:
+                    desc += f"💍 **Married to:** {partner.mention}\n\n"
+
             except:
                 desc += "💍 **Married to:** Unknown\n"
             cookieTitle = "🍪 Personal Cookies"
@@ -190,6 +217,28 @@ async def profile(ctx, userID = '0'):
                 add_section(right[0], right[1])
             else:
                 add_section("\u200b", "\u200b")
+
+        if is_bella:
+            stats_embed.add_field(
+                name="🦋 Cuteness Detector",
+                value=(
+                    "**Species:** Adorable Bellita 💜\n"
+                    "**Armed:** Pan Detected 🍳\n"
+                    "**Protected By:** Johnny ❤️"
+                ),
+                inline=False
+            )
+
+        elif is_bella_partner:
+            stats_embed.add_field(
+                name="💜 Cuteness Detector",
+                value=(
+                    "**Species:** Bella's Man 💕\n"
+                    "**Occupation:** Loving Bellita ❤️\n"
+                    "**Survival Status:** Smacked by Pans 🍳"
+                ),
+                inline=False
+            )
 
         stats_embed.set_thumbnail(url=member.display_avatar.url)
         

@@ -1,8 +1,12 @@
 from resources.mrcookie import instance as bot
 import discord
 from discord.ext import commands
+from datetime import datetime, timezone
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
+
+BELLA_ID = 846544080111665182
+JOHN_ID = 194962036784889858
 
 
 class MarriageView(discord.ui.View):
@@ -42,6 +46,19 @@ async def marry(ctx, user: discord.Member):
 
         userID = str(user.id)
         senderID = str(ctx.author.id)
+
+        ## Bella is only allowed to marry John 💜
+        if senderID == BELLA_ID and userID != JOHN_ID:
+            await ctx.send(
+                "You must've been hacked bellita, because you're already married to Johnny. 💜\n"
+                "Request denied. You already have your man."
+            )
+            return
+        if userID == BELLA_ID and senderID != JOHN_ID:
+            await ctx.send(
+                "Absolutely not. Bella is already reserved for Johnny. 💜"
+            )
+            return
 
         sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
 
@@ -121,6 +138,17 @@ async def marry(ctx, user: discord.Member):
         ## update db
         await update_value(userID, guildID, "Married", userMarried)
         await update_value(senderID, guildID, "Married", senderMarried)
+
+        marriage_date = datetime.now(timezone.utc)
+
+        await update_value(userID, guildID, "MarriageDate", marriage_date)
+        await update_value(senderID, guildID, "MarriageDate", marriage_date)
+
+        await update_value(userID, guildID, "PartnerCookiesGiven", 0)
+        await update_value(senderID, guildID, "PartnerCookiesGiven", 0)
+
+        await update_value(userID, guildID, "CoupleCookiesEarned", 0)
+        await update_value(senderID, guildID, "CoupleCookiesEarned", 0)
 
     except Exception as Error:
         await ctx.send(str(Error))

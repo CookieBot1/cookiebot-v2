@@ -47,3 +47,71 @@ user_prompts: dict[str, str] = {
     "What's 2+2? *(hint: 'four')*": "4",
     "What's 9+10? *(hint: 'yo stupid')*": "21",
 }
+
+bella_prompts: dict[str, str] = {
+    # -------------------- BELLA PROMPTS --------------------
+
+    # The special +50 Bella drop
+    "Quick! Everyone say `​b​﻿e​﻿l​﻿l​﻿a` RIGHT NOW!!! 💜": "bella",
+
+    # more bellita
+    "God FORBID I ask you to say `​b​﻿e​﻿l​﻿l​﻿i​﻿t​﻿a` 🙄": "bellita",
+    "God FORBID I want a `​c​﻿o​﻿o​﻿k​﻿i​﻿e` around here 🙄": "cookie",
+    "God FORBID I enjoy a little `​r​﻿o​﻿r​﻿o​﻿x` 🙄": "rorox",
+    "God FORBID I want a big black lifted `​t​﻿r​﻿u​﻿c​﻿k` 🙄": "truck",
+    "God bless I finally got my `​c​﻿o​﻿o​﻿k​﻿i​﻿e` 💅": "cookie",
+    "God bless I have an iced caramel `​m​﻿a​﻿c​﻿c​﻿h​﻿i​﻿a​﻿t​﻿o` ✨": "macchiato",
+    "Line by line. Bar by bar. Say `​b​﻿e​﻿l​﻿l​﻿i​﻿t​﻿a`. 💅": "bellita",
+    "Line by line. Bar by bar. I need you to type `​r​﻿o​﻿r​﻿o​﻿x`. 💅": "rorox",
+    "Omg when I tell you to say `​p​﻿u​﻿r​﻿p​﻿l​﻿e`... SAY PURPLE 💜": "purple",
+    "Omg when I tell you these cookies are `​a​﻿m​﻿a​﻿z​﻿i​﻿n​﻿g`...": "amazing",
+    "This is music to my latina ears... say `​g​﻿a​﻿l​﻿l​﻿e​﻿t​﻿a` 🎶": "galleta",
+    "SLAYYYYYY GO `​G​﻿I​﻿R​﻿L` 💅💅💅": "girl",
+    "CLOCK `​I​﻿T` 🤏🤏🤏": "it",
+    "God FORBID a girl wants to `​S​﻿L​﻿A​﻿Y` 🙄": "slay",
+    "Omg when I tell you she `​A​﻿T​﻿E`... SHE ATE.": "ate",
+    "Line by line. Bar by bar. `​C​﻿L​﻿O​﻿C​﻿K` ITTT 🤏": "clock",
+
+    # musica
+    "Bella just put on `​r​﻿e​﻿g​﻿g​﻿a​﻿e​﻿t​﻿o​﻿n` ✨": "reggaeton",
+    "The back alley is blasting Albanian `​d​﻿r​﻿i​﻿l​﻿l` at full volume 😛": "drill",
+    "Quick! Bella needs some Romanian `​r​﻿a​﻿p` 🪩": "rap",
+    "This cookie drop needs more `​r​﻿e​﻿g​﻿g​﻿a​﻿e​﻿t​﻿o​﻿n` immediately 🧋": "reggaeton",
+
+    # her favs
+    "QUICK! Bella's favorite color! Say `​p​﻿u​﻿r​﻿p​﻿l​﻿e` 💜": "purple",
+    "A `​b​﻿u​﻿t​﻿t​﻿e​﻿r​﻿f​﻿l​﻿y` just landed on the cookie jar 🦋": "butterfly",
+    "John pulled up in a black lifted `​t​﻿r​﻿u​﻿c​﻿k` 🛻": "truck",
+    "Quick! Order an iced caramel `​m​﻿a​﻿c​﻿c​﻿h​﻿i​﻿a​﻿t​﻿o` ☕": "macchiato",
+    "There are Peanut `​m​﻿&​﻿m​﻿s` hidden in the cookie stash 🥜": "m&ms",
+    "Bella has Ritz and `​n​﻿u​﻿t​﻿e​﻿l​﻿l​﻿a` and she's NOT sharing 🍳": "nutella",
+    "Quick! Grab a `​r​﻿i​﻿t​﻿z` before Bella eats them all 🥠": "ritz",
+    "Omg when I tell you this `​S​﻿A​﻿L​﻿A​﻿D` is everything...": "salad",
+    "Bella put on Romanian rap and thinks she's a `​G​﻿A​﻿N​﻿G​﻿S​﻿T​﻿E​﻿R` now 🥹": "gangster",
+    "Bella tucked all her `​S​﻿T​﻿U​﻿F​﻿F​﻿I​﻿E​﻿S` into bed 🥹": "stuffies",
+
+    # lil bella trivia
+    "It's not Roblox anymore. It's `​r​﻿o​﻿r​﻿o​﻿x`. Get it right 🙄": "rorox",
+    "Quick! Say `​m​﻿e​﻿x​﻿i​﻿c​﻿o` 🇲🇽": "mexico",
+    "Quick! Say `​v​﻿e​﻿n​﻿e​﻿z​﻿u​﻿e​﻿l​﻿a` 🇻🇪": "venezuela",
+
+    # bella doesnt like dis
+    "🚨 FROG DETECTED 🚨 Quick! Say `​r​﻿u​﻿n` 🐸": "run",
+    "Someone put seafood near Bella... say `​a​﻿b​﻿s​﻿o​﻿l​﻿u​﻿t​﻿e​﻿l​﻿y​﻿n​﻿o​﻿t` 🤢": "absolutelynot",
+    "Someone offered Jella seafood. Say `​j​﻿a​﻿i​﻿l` immediately.": "jail",
+
+    # la bella pan
+    "🚨 BELLA HAS THE PAN 🚨 SAY `​R​﻿U​﻿N` 🍳": "run",
+    "Bella just pulled out her `​P​﻿A​﻿N`... it's over for you 🍳": "pan",
+    "Quick! Bella is about to `​S​﻿M​﻿A​﻿C​﻿K` you with the pan 😭": "smack",
+    "God FORBID Bella handles problems with a `​P​﻿A​﻿N` 🙄🍳": "pan",
+    "John got hit with Bella's pan. Say `​R​﻿I​﻿P` 😔": "rip",
+
+    # bellita old way of talking aww
+    "John found Bella's old msgs... `​U​﻿W​﻿U`": "uwu",
+    "Quick! Remind bella her fav word! Say `​U​﻿.​﻿U`": "u.u",
+    "Bella just looked at John like `​O​﻿_​﻿O`": "o_o",
+    "God FORBID a girl says `​U​﻿W​﻿U` 🙄": "uwu",
+}
+
+user_prompts = bella_prompts

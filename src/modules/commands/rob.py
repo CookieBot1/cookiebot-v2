@@ -15,6 +15,9 @@ from resources.checks import (
 from resources.constants import EMBED_GREEN, EMBED_RED
 from resources.mrcookie import instance as bot
 
+BELLA_ID = 846544080111665182
+BELLA_REVENGE_BONUS = 50
+
 
 @bot.command(aliases=["steal", "mug"])
 async def rob(ctx, userID="0"):
@@ -89,6 +92,24 @@ async def rob(ctx, userID="0"):
         userKey = str(userID)
         senderKey = str(sender_id)
 
+        ## custom bella code
+        if sender_id == BELLA_ID:
+            await ctx.send(
+                "Omg bellita.. are you trying to rob someone.. 🥺\n"
+                "But MAMAAA I'm in love with a CRIMINALLLL-\n"
+                "And this type of love isn't rational.. it's ❤️ PHYSICALLL ❤️"
+            )
+            await ctx.send(
+                "https://tenor.com/view/meme-milk-gif-6919750708092698197"
+            )
+
+        ## bella revenge system
+        bella_user = guild_data["users"].get(str(BELLA_ID), {})
+        bella_last_robber = bella_user.get("BellaLastRobber")
+
+        is_robbing_bella = userID == BELLA_ID
+        is_avenging_bella = bella_last_robber == userID
+
         user_cookies = user_data["users"][userKey]["Cookies"]
         user_rob_prot = user_data["users"][userKey].get("RobProtection") or datetime.now()
         user_rob_chances = user_data["users"][userKey]["RobChances"]  # likelihood target user is to be robbed
@@ -144,10 +165,35 @@ async def rob(ctx, userID="0"):
                 Cookies=user_cookies - stolen_cookies,
                 RobChances=urc if (urc := user_rob_chances + 0.2) < 11 else 11,
             )
-            await update_value(sender_id, guild_id, "Cookies", sender_cookies + stolen_cookies)
-            sender_rob_gains += stolen_cookies
+            ## bella revenge bonus
+            bella_bonus = 0
+
+            if is_avenging_bella:
+                bella_bonus = BELLA_REVENGE_BONUS
+
+                embed_desc += (
+                    f"\n\n **WOOO YOU AVENGED LA BELLA!** "
+                    f"You earned an extra ``{BELLA_REVENGE_BONUS}`` cookies "
+                    f"for defending La Bellita's honor."
+                )
+
+                ## revenge has been completed
+                await update_value(BELLA_ID, guild_id, "BellaLastRobber", None)
+
+            ## give robber their normal winnings + possible Bella bonus
+            total_gained = stolen_cookies + bella_bonus
+
+            await update_value(sender_id, guild_id, "Cookies", sender_cookies + total_gained)
+            sender_rob_gains += total_gained
             await update_value(sender_id, guild_id, "RobGains", sender_rob_gains)
 
+            ## someone successfully robbed Bella
+            if is_robbing_bella:
+                await update_value(BELLA_ID, guild_id, "BellaLastRobber", sender_id)
+                embed_desc += (
+                    "\n\n **YOU ROBBED LA BELLA??** "
+                    "Cookie bounty has been set on **YOU**. No one robs my girl you bag of spoiled milk."
+                )
         else:
             # fail
             embed_title = "🚓 Robbery Fumbled"

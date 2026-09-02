@@ -18,6 +18,9 @@ async def give(ctx, user: discord.Member, amount: int):
         if user.id == ctx.author.id:
             raise Exception("Invalid user, you can't give cookies to yourself!")
 
+        if user is None:
+            raise Exception("Invalid user, try again!")
+
         if guild.get_member(int(userID)) is None:
             raise Exception("Invalid user, try again!")
 

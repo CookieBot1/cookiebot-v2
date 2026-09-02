@@ -14,6 +14,8 @@ PROMPT_TIMEOUT = 75  # time for a drop to timeout
 PROMPT_COOLDOWN = (3 * 60) + PROMPT_TIMEOUT  # time between drops
 TIME_BETWEEN_USER_MSGS = 90  # time between messages for a drop to trigger
 
+BELLA_DROP_BONUS = 50
+
 # Handles cooldown logic
 channel_cooldowns: IDCooldown = IDCooldown(PROMPT_COOLDOWN)
 # Keeps track of which channels have an active prompt
@@ -100,6 +102,13 @@ class ChannelProcessor:
         self.prompt = random.choice(list(user_prompts.keys()))
         self.answer = user_prompts[self.prompt].lower()
         self.reward = random.randint(1, 16)
+
+        ## bella bonus drop
+        self.is_bella_drop = self.answer == "bella"
+
+        if self.is_bella_drop:
+            self.reward += BELLA_DROP_BONUS
+
         self.complete = False
         self.prompt_message = None
 
@@ -118,20 +127,26 @@ class ChannelProcessor:
         await self.on_complete(message)
 
     async def on_complete(self, message: discord.Message):
-        if not message.guild:
-            # for pylance, but this should be impossible anyway
-            return
-
-        author_id = message.author.id
-
-        prompt_embed = discord.Embed(
-            title="🎉 Cookies Collected!",
-            color=0x2ECC71,
-            description=(
-                f"Good job <@{author_id}> for being the fastest! Your pockets are now filled with "
-                f"{self.reward} more cookie{'s' if self.reward >1 else ''}."
-            ),
-        )
+        if self.is_bella_drop:
+            prompt_embed = discord.Embed(
+                title="💗 BELLA BONUS!",
+                color=0xFF69B4,
+                description=(
+                    f"Good job <@{author_id}> for being the fastest!\n\n"
+                    f"You said **bella** 🥹 and earned an extra "
+                    f"``{BELLA_DROP_BONUS}`` cookies!\n\n"
+                    f"🍪 **Total earned:** ``{self.reward}`` cookies"
+                ),
+            )
+        else:
+            prompt_embed = discord.Embed(
+                title="🎉 Cookies Collected!",
+                color=0x2ECC71,
+                description=(
+                    f"Good job <@{author_id}> for being the fastest! Your pockets are now filled with "
+                    f"{self.reward} more cookie{'s' if self.reward > 1 else ''}."
+                ),
+            )
 
         await message.reply(embed=prompt_embed, mention_author=False, delete_after=8)
         await message.delete(delay=8)
