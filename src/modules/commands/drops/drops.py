@@ -127,6 +127,8 @@ class ChannelProcessor:
         await self.on_complete(message)
 
     async def on_complete(self, message: discord.Message):
+        author_id = message.author.id
+        
         if self.is_bella_drop:
             prompt_embed = discord.Embed(
                 title="💗 BELLA BONUS!",
