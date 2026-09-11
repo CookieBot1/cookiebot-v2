@@ -1,5 +1,5 @@
 # Format where the key is the question/prompt. The value is the accepted response.
-user_prompts: dict[str, str] = {
+normal_prompts: dict[str, str] = {
     "Quick! Repeat after me! Say `​s​﻿u​﻿p​﻿e​﻿r​﻿c​﻿a​﻿l​﻿i​﻿f​﻿r​﻿a​﻿g​﻿i​﻿l​﻿i​﻿s​﻿t​﻿i​﻿c​﻿e​﻿x​﻿p​﻿i​﻿a​﻿l​﻿i​﻿d​﻿o​﻿c​﻿i​﻿o​﻿u​﻿s`!": "supercalifragilisticexpialidocious",
     "Quick! Repeat after me! Say `​m​﻿a​﻿c​﻿a​﻿d​﻿a​﻿m​﻿i​﻿a`!": "macadamia",
     "Quick! Repeat after me! Say `​j​﻿o​﻿h​﻿n`!": "john",
@@ -109,9 +109,7 @@ bella_prompts: dict[str, str] = {
 
     # bellita old way of talking aww
     "John found Bella's old msgs... `​U​﻿W​﻿U`": "uwu",
-    "Quick! Remind bella her fav word! Say `​U​﻿.​﻿U`": "u.u",
+    "Quick! Remind bella her fav word! Say `​U​﻿_​﻿U`": "u_u",
     "Bella just looked at John like `​O​﻿_​﻿O`": "o_o",
     "God FORBID a girl says `​U​﻿W​﻿U` 🙄": "uwu",
 }
-
-user_prompts = bella_prompts

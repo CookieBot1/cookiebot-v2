@@ -7,7 +7,9 @@ from resources import checks
 from resources.id_cooldown import IDCooldown
 from resources.mrcookie import instance as bot
 
-from .prompts import user_prompts
+from .prompts import normal_prompts, bella_prompts
+
+SPACE_SERVER_ID = 918211605970423838
 
 # all units in seconds
 PROMPT_TIMEOUT = 75  # time for a drop to timeout
@@ -66,7 +68,7 @@ async def process_trigger(channel: discord.TextChannel):
     # lock as soon as possible once processing
     channel_lock.add(str(channel.id))
 
-    ch_prsr = ChannelProcessor(str(channel.id))
+    ch_prsr = ChannelProcessor(str(channel.id), channel.guild.id)
 
     # Send prompt
     prompt_embed = discord.Embed(
@@ -97,10 +99,17 @@ async def process_trigger(channel: discord.TextChannel):
 
 
 class ChannelProcessor:
-    def __init__(self, channel_id: str):
+    def __init__(self, channel_id: str, guild_id: int):
         self.channel_id = channel_id
-        self.prompt = random.choice(list(user_prompts.keys()))
-        self.answer = user_prompts[self.prompt].lower()
+        self.guild_id = guild_id
+
+        if guild_id == SPACE_SERVER_ID:
+            prompt_pool = bella_prompts
+        else:
+            prompt_pool = normal_prompts
+
+        self.prompt = random.choice(list(prompt_pool.keys()))
+        self.answer = prompt_pool[self.prompt].strip().lower()
         self.reward = random.randint(1, 16)
 
         ## bella bonus drop
