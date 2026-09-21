@@ -192,7 +192,7 @@ async def daily(ctx):
                 color=0x9B59B6
             )
 
-            bella_embed.set_footer(text="— Johnny, your nerd, lover, and best friend 💜")
+            bella_embed.set_footer(text="— Johnny, your husband, lover, and best friend 💜")
 
             await ctx.send(embed=bella_embed)
 
