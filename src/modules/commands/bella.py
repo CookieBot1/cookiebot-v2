@@ -61,7 +61,7 @@ async def bella(ctx):
         if bella is None:
             try:
                 bella = await ctx.guild.fetch_member(BELLA_ID)
-            except:
+            except discord.NotFound:
                 bella = None
 
         title = random.choice(BELLA_TITLES)

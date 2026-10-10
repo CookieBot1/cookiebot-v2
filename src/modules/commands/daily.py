@@ -107,8 +107,7 @@ async def daily(ctx):
     try:
         userID = str(ctx.author.id)
         guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
-        user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+        user = ctx.author
 
         ## this block fetches user data from the database
         userData = await lookup_database(userID, guildID) 

@@ -32,13 +32,21 @@ async def balance(ctx, userID = '0'):
         ## if another user was mentioned, check if they're legit, else use sender ID
         if userID != '0':
             userID = await validate_user(userID)
-            if userID == None or guild.get_member(int(userID)) is None: raise Exception("Invalid user, try again!")
+            
+            if userID is None:
+                raise Exception("Invalid user, try again!")
+
+            try:
+                await guild.fetch_member(int(userID))
+            except discord.NotFound:
+                raise Exception("Invalid user, try again!")
+
             if await is_blacklisted(userID): raise Exception("Can't show stats, user is blacklisted.")
         else:
             userID = ctx.author.id
         
         ## set vars
-        user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+        user = ctx.author if int(userID) == ctx.author.id else await guild.fetch_member(int(userID))
         
         ## this block fetches their data from the database
         userData = await lookup_database(userID, guildID) 
@@ -62,7 +70,8 @@ async def balance(ctx, userID = '0'):
 
         ## check if married
         if userMarried != 0:
-            embed_title = f"💍 {user.display_name} & {bot.get_user(userMarried).display_name}'s Cookie Balance"
+            married_user = bot.get_user(userMarried) or await bot.fetch_user(userMarried)
+            embed_title = f"💍 {user.display_name} & {married_user.display_name}'s Cookie Balance"
             marriedCookies = userData["users"][str(userMarried)]["Cookies"]
             userCookies = userCookies + marriedCookies
         else:

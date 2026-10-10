@@ -20,7 +20,8 @@ discord.utils.setup_logging()
 # intent
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True
+intents.members = False
+intents.presences = False
 
 
 async def main():

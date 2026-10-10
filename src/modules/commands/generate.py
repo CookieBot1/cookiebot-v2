@@ -22,12 +22,14 @@ async def generate(ctx, userID = '0', amount = "0"):
         userID = int(userID)
         userKey = str(userID)
 
-        if userID == None or guild.get_member(userID) is None: raise Exception("Invalid user, try again!")
+        try:
+            user = await guild.fetch_member(userID)
+        except discord.NotFound:
+            raise Exception("Invalid user, try again!")
         if await is_blacklisted(userID): raise Exception("Illegal activity! You can't generate for a blacklisted user!")
         if amount == "0": raise Exception("Invalid amount, try again!")
         
         amount = int(amount)
-        user = guild.get_member(userID) or await guild.fetch_member(userID)
 
         ## this block fetches user data from the database
         userData = await lookup_database(userID, guildID) 

@@ -55,14 +55,20 @@ async def divorce(ctx):
 
         ## get partner
         partnerID = str(senderMarried)
-        partner = ctx.guild.get_member(int(partnerID)) or await ctx.guild.fetch_member(int(partnerID))
+        partner = ctx.guild.get_member(int(partnerID))
+
+        if partner is None:
+            try:
+                partner = await ctx.guild.fetch_member(int(partnerID))
+            except discord.NotFound:
+                partner = None
 
         ## confirmation view
         view = DivorceView(ctx.author)
 
         confirm_embed = discord.Embed(
             title="💔 Divorce Confirmation",
-            description=f"Are you sure you want to divorce with {partner.mention} ({partner.display_name})?",
+            description=f"Are you sure you want to divorce with <@{partnerID}> ({partner.display_name if partner else 'User not in server'})?",
             color=0xe74c3c
         )
 
@@ -89,7 +95,7 @@ async def divorce(ctx):
         ## success message
         divorce_embed = discord.Embed(
             title="💔 Divorce Finalized..",
-            description=f"{ctx.author.mention} is now divorced from {partner.mention}.",
+            description=f"{ctx.author.mention} is now divorced from <@{partnerID}>.",
             color=0x95a5a6
         )
         await ctx.send(embed=divorce_embed)

@@ -7,21 +7,16 @@ from resources.checks import lookup_database, new_database, update_value, is_bla
 async def give(ctx, user: discord.Member, amount: int):
     try:
         guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
-
         userID = str(user.id)
         senderID = str(ctx.author.id)
 
-        sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
+        sender = ctx.author
 
         ## validation
         if user.id == ctx.author.id:
             raise Exception("Invalid user, you can't give cookies to yourself!")
 
         if user is None:
-            raise Exception("Invalid user, try again!")
-
-        if guild.get_member(int(userID)) is None:
             raise Exception("Invalid user, try again!")
 
         if await is_blacklisted(userID):

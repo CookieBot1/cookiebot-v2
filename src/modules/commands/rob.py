@@ -25,7 +25,7 @@ async def rob(ctx, userID="0"):
         guild_id = ctx.guild.id
         guild = ctx.bot.get_guild(guild_id)
         sender_id = ctx.author.id
-        sender = guild.get_member(int(sender_id)) or await guild.fetch_member(int(sender_id))
+        sender = ctx.author
 
         ## this block fetches user data from the database
         guild_data = await lookup_database(sender_id, guild_id)
@@ -54,8 +54,13 @@ async def rob(ctx, userID="0"):
         ## validate the pinged user, if any. if empty user parameter, get random user from database
         if userID != "0":
             userID = await validate_user(userID)
-            if userID == None or guild.get_member(int(userID)) is None or userID == ctx.author.id:
-                raise Exception("Invalid user, try again!")
+        if userID is None or int(userID) == ctx.author.id:
+            raise Exception("Invalid user, try again!")
+
+        try:
+            await guild.fetch_member(int(userID))
+        except discord.NotFound:
+            raise Exception("Invalid user, try again!")
             if await is_blacklisted(int(userID)):
                 raise Exception("Unable to rob, that user is blacklisted.")
             

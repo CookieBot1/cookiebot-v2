@@ -68,9 +68,9 @@ async def on_message(message: discord.Message):
     if not channel:
         return  # Channel could not be found.
 
-    guild = bot.get_guild(message.guild.id)
     userID = str(message.author.id)
-    user = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+    user = message.author
+
     guildID = message.guild.id
     try:
         allow_math = counterData["settings"]["counter"]["AllowMath"]

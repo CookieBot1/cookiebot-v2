@@ -42,8 +42,6 @@ class MarriageView(discord.ui.View):
 async def marry(ctx, user: discord.Member):
     try:
         guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
-
         userID = str(user.id)
         senderID = str(ctx.author.id)
 
@@ -60,14 +58,11 @@ async def marry(ctx, user: discord.Member):
             )
             return
 
-        sender = guild.get_member(int(senderID)) or await guild.fetch_member(int(senderID))
+        sender = ctx.author
 
         ## validation
         if user.id == ctx.author.id:
             raise Exception("Invalid user, you can't marry yourself!")
-
-        if guild.get_member(int(userID)) is None:
-            raise Exception("Invalid user, try again!")
 
         if await is_blacklisted(userID):
             raise Exception("Illegal activity! You can't marry a blacklisted user!")

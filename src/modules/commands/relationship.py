@@ -63,7 +63,12 @@ async def relationship(ctx, userID="0"):
         if userID != "0":
             userID = await validate_user(userID)
 
-            if userID is None or guild.get_member(int(userID)) is None:
+            if userID is None:
+                raise Exception("Invalid user, try again!")
+
+            try:
+                await guild.fetch_member(int(userID))
+            except discord.NotFound:
                 raise Exception("Invalid user, try again!")
 
             if await is_blacklisted(userID):
@@ -73,7 +78,10 @@ async def relationship(ctx, userID="0"):
 
         userID = str(userID)
 
-        member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+        if int(userID) == ctx.author.id:
+            member = ctx.author
+        else:
+            member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
 
         ## fetch user database
         userData = await lookup_database(userID, guildID)
