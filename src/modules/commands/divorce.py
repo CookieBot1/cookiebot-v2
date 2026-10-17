@@ -1,8 +1,9 @@
+
 from resources.mrcookie import instance as bot
 import discord
-from discord.ext import commands
+from discord import app_commands
 
-from resources.checks import lookup_database, new_database, update_value, is_blacklisted
+from resources.checks import lookup_database, new_database, update_value
 
 class DivorceView(discord.ui.View):
     def __init__(self, user):
@@ -32,11 +33,14 @@ class DivorceView(discord.ui.View):
         self.stop()
 
 
-@bot.command(aliases=['separate', 'split'])
-async def divorce(ctx):
+@bot.tree.command(name="divorce", description="Divorce your current partner.")
+@app_commands.guild_only()
+async def divorce(interaction: discord.Interaction):
     try:
-        guildID = ctx.guild.id
-        senderID = str(ctx.author.id)
+        await interaction.response.defer()
+
+        guildID = interaction.guild.id
+        senderID = str(interaction.user.id)
 
         ## get sender data
         senderData = await lookup_database(senderID, guildID)
@@ -55,16 +59,16 @@ async def divorce(ctx):
 
         ## get partner
         partnerID = str(senderMarried)
-        partner = ctx.guild.get_member(int(partnerID))
+        partner = interaction.guild.get_member(int(partnerID))
 
         if partner is None:
             try:
-                partner = await ctx.guild.fetch_member(int(partnerID))
+                partner = await interaction.guild.fetch_member(int(partnerID))
             except discord.NotFound:
                 partner = None
 
         ## confirmation view
-        view = DivorceView(ctx.author)
+        view = DivorceView(interaction.user)
 
         confirm_embed = discord.Embed(
             title="💔 Divorce Confirmation",
@@ -72,7 +76,7 @@ async def divorce(ctx):
             color=0xe74c3c
         )
 
-        confirm_message = await ctx.send(embed=confirm_embed, view=view)
+        confirm_message = await interaction.followup.send(embed=confirm_embed, view=view, wait=True)
         await view.wait()
 
         ## delete confirmation message
@@ -83,10 +87,10 @@ async def divorce(ctx):
 
         ## handle result
         if view.confirmed is None:
-            return await ctx.send("Divorce timed out")
+            return await interaction.followup.send("Divorce timed out")
 
         if view.confirmed == False:
-            return await ctx.send("Divorce cancelled")
+            return await interaction.followup.send("Divorce cancelled")
 
         ## update BOTH users
         await update_value(senderID, guildID, "Married", 0)
@@ -95,10 +99,13 @@ async def divorce(ctx):
         ## success message
         divorce_embed = discord.Embed(
             title="💔 Divorce Finalized..",
-            description=f"{ctx.author.mention} is now divorced from <@{partnerID}>.",
+            description=f"{interaction.user.mention} is now divorced from <@{partnerID}>.",
             color=0x95a5a6
         )
-        await ctx.send(embed=divorce_embed)
+        await interaction.followup.send(embed=divorce_embed)
 
     except Exception as Error:
-        await ctx.send(str(Error))
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)

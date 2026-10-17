@@ -1,16 +1,20 @@
 import discord
+from discord import app_commands
 from resources.mrcookie import instance as bot
 
 from resources.checks import lookup_database, new_database, update_value
 
-@bot.command()
-async def eat(ctx):
+@bot.tree.command(name="eat", description="Eat one of your cookies.")
+@app_commands.guild_only()
+async def eat(interaction: discord.Interaction):
     try:
-        userID = str(ctx.author.id)
-        guildID = ctx.guild.id
+        await interaction.response.defer()
+
+        userID = str(interaction.user.id)
+        guildID = interaction.guild.id
 
         ## this block fetches user data from the database
-        userData = await lookup_database(userID, guildID) 
+        userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
@@ -21,7 +25,10 @@ async def eat(ctx):
         else:
             userCookies -= 1
             await update_value(userID, guildID, "Cookies", userCookies)
-            await ctx.send("Nom nom, you ate 1 cookie 🍪")
+            await interaction.followup.send("Nom nom, you ate 1 cookie 🍪")
 
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)
