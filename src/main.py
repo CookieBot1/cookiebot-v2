@@ -19,7 +19,7 @@ discord.utils.setup_logging()
 
 # intent
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = False
 intents.members = False
 intents.presences = False
 
@@ -51,7 +51,11 @@ async def main():
 
             bot.load_module(f"{directory.replace('/','.')}.{filename}")
 
-    await bot.start(token = os.getenv("token"))
+    async with bot:
+        await bot.login(token=os.getenv("token"))
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} slash commands: {[cmd.name for cmd in synced]}")
+        await bot.connect()
 
 
 if __name__ == "__main__":

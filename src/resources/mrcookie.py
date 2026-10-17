@@ -111,3 +111,19 @@ class MongoDB:
         cursor = self.db.master_data.find(projection={"_id": 1})
         document = await cursor.to_list(None)
         return document
+
+    # username cache collection
+    async def get_cached_username(self, userID: str):
+        return await self.db.username_cache.find_one({"_id": str(userID)})
+
+    async def save_cached_username(self, userID: str, username: str):
+        from datetime import datetime, timezone
+
+        await self.db.username_cache.update_one(
+            {"_id": str(userID)},
+            {"$set": {
+                "username": username,
+                "updated_at": datetime.now(timezone.utc)
+            }},
+            upsert=True
+        )

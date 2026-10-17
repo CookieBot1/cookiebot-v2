@@ -1,7 +1,8 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 
-from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
+from resources.checks import lookup_database, new_database, is_blacklisted
 from typing import Optional
 from attrs import define, field
 
@@ -22,34 +23,30 @@ class SimpleUser:
         f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
         )
 
-@bot.command(aliases = ["bal", "wallet"])
-async def balance(ctx, userID = '0'):
+@bot.tree.command(name="balance", description="Check your cookie balance or another user's balance.")
+@app_commands.describe(user="The user whose cookie balance you want to view.")
+@app_commands.guild_only()
+async def balance(interaction: discord.Interaction, user: Optional[discord.Member] = None):
     try:
         ## set vars
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
+        guildID = interaction.guild.id
+        guild = interaction.guild
 
         ## if another user was mentioned, check if they're legit, else use sender ID
-        if userID != '0':
-            userID = await validate_user(userID)
-            
-            if userID is None:
-                raise Exception("Invalid user, try again!")
-
-            try:
-                await guild.fetch_member(int(userID))
-            except discord.NotFound:
-                raise Exception("Invalid user, try again!")
+        if user is not None:
+            userID = user.id
 
             if await is_blacklisted(userID): raise Exception("Can't show stats, user is blacklisted.")
         else:
-            userID = ctx.author.id
-        
+            userID = interaction.user.id
+
         ## set vars
-        user = ctx.author if int(userID) == ctx.author.id else await guild.fetch_member(int(userID))
-        
+        user = interaction.user if int(userID) == interaction.user.id else user
+
+        await interaction.response.defer()
+
         ## this block fetches their data from the database
-        userData = await lookup_database(userID, guildID) 
+        userData = await lookup_database(userID, guildID)
         if userData == False:
             await new_database(userID, guildID)
             userData = await lookup_database(userID, guildID)
@@ -99,7 +96,7 @@ async def balance(ctx, userID = '0'):
                 rank_id = f"{uid}+{married_id}"
             else:
                 rank_id = uid
-            
+
             already_counted.add(uid)
             rank_list.append({
                 "rank_id": rank_id,
@@ -119,13 +116,16 @@ async def balance(ctx, userID = '0'):
             title = embed_title,
             color = userProfileColor,
             )
-    
+
         bal_embed.add_field(name = "Cookies", value = userCookies, inline = True)
 
         rank_value = this_user["position"] if this_user else "Unranked"
         bal_embed.add_field(name = "Rank", value = rank_value, inline = True)
         bal_embed.set_thumbnail(url = user.display_avatar.url)
-        await ctx.send(embed=bal_embed)
-    
+        await interaction.followup.send(embed=bal_embed)
+
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error))
+        else:
+            await interaction.response.send_message(str(Error))
