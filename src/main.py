@@ -37,7 +37,19 @@ async def main():
 
     @bot.tree.interaction_check
     async def global_blacklist_check(interaction: discord.Interaction) -> bool:
-        if await is_blacklisted(interaction.user.id):
+        try:
+            blacklisted = await asyncio.wait_for(
+                is_blacklisted(interaction.user.id),
+                timeout=2.0
+            )
+        except asyncio.TimeoutError:
+            await interaction.response.send_message(
+                "CookieBot is having trouble checking permissions. Please try again.",
+                ephemeral=True
+            )
+            return False
+
+        if blacklisted:
             await interaction.response.send_message(
                 "You are blacklisted from using CookieBot.",
                 ephemeral=True

@@ -1,19 +1,24 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
 
-@bot.command(aliases=["transfer", "send"])
-async def give(ctx, user: discord.Member, amount: int):
+@bot.tree.command(name="give", description="Give cookies to another user.")
+@app_commands.guild_only()
+@app_commands.describe(user="The user to give cookies to.", amount="The number of cookies to give.")
+async def give(interaction: discord.Interaction, user: discord.Member, amount: int):
     try:
-        guildID = ctx.guild.id
-        userID = str(user.id)
-        senderID = str(ctx.author.id)
+        await interaction.response.defer()
 
-        sender = ctx.author
+        guildID = interaction.guild.id
+        userID = str(user.id)
+        senderID = str(interaction.user.id)
+
+        sender = interaction.user
 
         ## validation
-        if user.id == ctx.author.id:
+        if user.id == interaction.user.id:
             raise Exception("Invalid user, you can't give cookies to yourself!")
 
         if user is None:
@@ -62,11 +67,14 @@ async def give(ctx, user: discord.Member, amount: int):
         give_embed.set_author(name="", icon_url=sender.display_avatar)
         give_embed.set_footer(text="Cookies delivered by Sam")
 
-        await ctx.send(embed=give_embed)
+        await interaction.followup.send(embed=give_embed)
 
         ## update the database
         await update_value(userID, guildID, "Cookies", userCookies)
         await update_value(senderID, guildID, "Cookies", senderCookies)
 
     except Exception as Error:
-        await ctx.send(str(Error))
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)
