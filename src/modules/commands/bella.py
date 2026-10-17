@@ -1,5 +1,6 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 import random
 
 BELLA_ID = 846544080111665182
@@ -53,14 +54,15 @@ BELLA_FACTS = [
     "She has girly quotes all over her room and it's so adorable, like 'girls will be girls' and I just can't help but admire her cuteness.",
 ]
 
-@bot.command()
-async def bella(ctx):
+@app_commands.guild_only()
+@bot.tree.command(name="bella", description="Learn all about Bellita! 💜")
+async def bella(interaction: discord.Interaction):
     try:
-        bella = ctx.guild.get_member(BELLA_ID)
+        bella = interaction.guild.get_member(BELLA_ID)
 
         if bella is None:
             try:
-                bella = await ctx.guild.fetch_member(BELLA_ID)
+                bella = await interaction.guild.fetch_member(BELLA_ID)
             except discord.NotFound:
                 bella = None
 
@@ -135,10 +137,10 @@ async def bella(ctx):
         )
 
         embed.add_field(
-            name="❤️ Her Person",
+            name="<3 Jella",
             value=(
-                "Johnny — her husband, lover, best friend, "
-                "and the luckiest guy to have the most perfect partner in the world, my babybella 💜"
+                "Johnny — her lover & best friend, "
+                "and the luckiest man in the world to spend everyday with her 💜"
             ),
             inline=False
         )
@@ -150,10 +152,10 @@ async def bella(ctx):
             text="*Thug certification has not been verified by THE Thug Johnny."
         )
 
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
         # special response if Bella herself runs the command
-        if ctx.author.id == BELLA_ID:
+        if interaction.user.id == BELLA_ID:
             bella_messages = [
                 "heyyy mi amorrr 🥹💜 si, this whole command is litt about you, my fav cmd in the WHOLE bot",
                 "babyyy don't forget to drink water 😭💜 also I LOVE YOUUU",
@@ -161,7 +163,10 @@ async def bella(ctx):
                 "SLAYYYYY GO GIRL 💅 even CookieBot knows you're bodytee and other tiktok words ❤️",
             ]
 
-            await ctx.send(random.choice(bella_messages))
+            await interaction.followup.send(random.choice(bella_messages))
 
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)

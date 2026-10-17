@@ -1,6 +1,5 @@
 import asyncio
 
-
 class IDCooldown:
     """Background handling of a cooldown"""
 

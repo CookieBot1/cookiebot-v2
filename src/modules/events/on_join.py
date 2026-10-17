@@ -6,5 +6,3 @@ from resources.checks import new_counter, new_server, lookup_counter, lookup_ser
 async def on_guild_join(guild):
     if await lookup_server(guild.id) == False:
         await new_server(guild.id)
-  
-    

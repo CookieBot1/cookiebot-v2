@@ -1,5 +1,6 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 from datetime import datetime, timedelta, timezone
 
 from resources.checks import lookup_database, new_database, update_database, lookup_bot_central
@@ -67,18 +68,18 @@ BELLA_DAILY_MESSAGES = [
     "Come hereeeee lemme kiss your pretty faceeee 😚❤️ CookieBot can waitttt",
     "If you're reading this, you legally owe Johnny one- I mean fifty kisses. Sorry baby I don't make the rules (yes I doooo)",
     "lowkeyyy imagine having a husband nerdy enough to code you into his Discord bot 😭 like yk... couldn't be you... oh wait.. WAIT AM I A NERD BABE?",
-    "You thought you were just running `.daily` LMAOOOO GET LOVED AND KISSED LOSERRRR LLLLLLL 🫵😂❤️",
+    "You thought you were just running `/daily` LMAOOOO GET LOVED AND KISSED LOSERRRR LLLLLLL 🫵😂❤️",
 ]
 
-async def send_dev_alert(ctx, userData, userID):
+async def send_dev_alert(interaction, userData, userID):
     # respect per-guild subscription toggle
     u = userData["users"][userID]
     if not bool(u.get("DevAlerts", False)):
-        return
+        return None
 
     latest_alert = get_latest_active_alert()
     if not latest_alert:
-        return
+        return None
 
     current_id = latest_alert.get("date")
     state = u.get("AlertState", {})
@@ -93,21 +94,26 @@ async def send_dev_alert(ctx, userData, userID):
 
     # If unread for this alert and under 2 reminders
     if read_id != current_id and ping_count < 2:
-        await ctx.send("Hey, <@!" + str(ctx.author.id) + ">! There's a 🔔 **New Developer Alert!** Run `.alert` to view it.")
+        alert_message = "Hey, <@!" + str(interaction.user.id) + ">! There's a 🔔 **New Developer Alert!** Run `/alerts` to view it."
         ping_count += 1
+    else:
+        alert_message = None
 
     u["AlertState"] = {
         "readId": read_id,
         "pingForId": ping_for,
         "pingCount": ping_count
     }
+    return alert_message
 
-@bot.command()
-async def daily(ctx):
+@app_commands.guild_only()
+@bot.tree.command(name="daily", description="Collect your daily cookies and build your streak.")
+async def daily(interaction: discord.Interaction):
     try:
-        userID = str(ctx.author.id)
-        guildID = ctx.guild.id
-        user = ctx.author
+        await interaction.response.defer()
+        userID = str(interaction.user.id)
+        guildID = interaction.guild.id
+        user = interaction.user
 
         ## this block fetches user data from the database
         userData = await lookup_database(userID, guildID) 
@@ -143,7 +149,7 @@ async def daily(ctx):
                 text = "Tomorrow at " + userDailyExpire.strftime("%I:%M %p")
             )   
             cooldown_embed.set_author(name = "Not yet " + str(user.display_name) + "!", icon_url = user.display_avatar)
-            await ctx.send(embed=cooldown_embed)
+            await interaction.followup.send(embed=cooldown_embed)
             return
 
         ## calculate and give daily cookies
@@ -179,10 +185,9 @@ async def daily(ctx):
 
         dailyembed.set_author(name = "Daily Cookies - " + str(user.display_name), icon_url = user.display_avatar)
         dailyembed.set_footer(text = "You can collect again in 23 hours.")
-        await ctx.send(embed=dailyembed)
 
         ## special Bella daily love message
-        if ctx.author.id == BELLA_ID:
+        if interaction.user.id == BELLA_ID:
             love_message = random.choice(BELLA_DAILY_MESSAGES)
 
             bella_embed = discord.Embed(
@@ -193,9 +198,8 @@ async def daily(ctx):
 
             bella_embed.set_footer(text="— Johnny, your husband, lover, and best friend 💜")
 
-            await ctx.send(embed=bella_embed)
 
-        await send_dev_alert(ctx, userData, userID) ## check for dev alert and ping if unread
+        alert_message = await send_dev_alert(interaction, userData, userID) ## check for dev alert and ping if unread
 
         ## update the database
         userData["users"][userID]["Cookies"] = userCookies
@@ -205,6 +209,17 @@ async def daily(ctx):
         userData["users"][userID]["DailyExpire"] = userDailyExpire
         
         await update_database(userID, guildID, userData["users"][userID])
-        
+
+        await interaction.followup.send(embed=dailyembed)
+
+        if interaction.user.id == BELLA_ID:
+            await interaction.followup.send(embed=bella_embed)
+
+        if alert_message:
+            await interaction.followup.send(alert_message)
+
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)

@@ -33,6 +33,18 @@ async def main():
     )
 
     bot.latest_alert = None
+    from resources.checks import is_blacklisted
+
+    @bot.tree.interaction_check
+    async def global_blacklist_check(interaction: discord.Interaction) -> bool:
+        if await is_blacklisted(interaction.user.id):
+            await interaction.response.send_message(
+                "You are blacklisted from using CookieBot.",
+                ephemeral=True
+            )
+            return False
+
+        return True
 
     MODULES = ["modules/commands", "modules/events", "modules/commands/drops", "modules/commands/counter"]
     bot.remove_command('help') # remove the default help command

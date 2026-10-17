@@ -1,4 +1,4 @@
-# Primarily copied from myself (Nub) from here -
+# Primarily copied from Nub from here -
 # https://github.com/One-Nub/helper-bot/blob/main/src/modules/events/on_interaction.py
 
 import logging

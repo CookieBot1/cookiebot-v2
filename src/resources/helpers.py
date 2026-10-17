@@ -112,7 +112,8 @@ def get_latest_active_alert():
     return alert
 
 def get_guild_icon(ctx):
-    try:
+    if ctx.guild and ctx.guild.icon:
         return ctx.guild.icon.url
-    except AttributeError:
-        return ctx.bot.user.display_avatar.url
+
+    client = ctx.client if isinstance(ctx, discord.Interaction) else ctx.bot
+    return client.user.display_avatar.url
