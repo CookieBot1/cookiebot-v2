@@ -33,9 +33,15 @@ async def main():
     )
 
     bot.latest_alert = None
-    from resources.checks import is_blacklisted
+    @bot.listen("on_interaction")
+    async def debug_interaction(interaction: discord.Interaction):
+        if interaction.type == discord.InteractionType.application_command:
+            delay = (discord.utils.utcnow() - interaction.created_at).total_seconds()
+            print(f"[INTERACTION DEBUG] Command received after {delay:.2f}s")
 
-    '''@bot.tree.interaction_check
+    '''from resources.checks import is_blacklisted
+
+    @bot.tree.interaction_check
     async def global_blacklist_check(interaction: discord.Interaction) -> bool:
         try:
             blacklisted = await asyncio.wait_for(
