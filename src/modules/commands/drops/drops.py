@@ -1,4 +1,4 @@
-import asyncio
+'''import asyncio
 import random
 
 import discord
@@ -174,4 +174,4 @@ class ChannelProcessor:
         user_data = guild_data.get("users", {}).get(str(author_id), {"Cookies": 0})  # type: ignore
         user_cookies = user_data["Cookies"] + self.reward
 
-        await checks.update_value(author_id, guild_id, "Cookies", user_cookies)
+        await checks.update_value(author_id, guild_id, "Cookies", user_cookies)'''

@@ -28,7 +28,7 @@ async def on_message(message):
     # allow commands everywhere else
     await bot.process_commands(message)
 
-@bot.listen()
+'''@bot.listen()
 async def on_message_delete(message: discord.Message):
     if message.guild is None:
         return
@@ -78,5 +78,5 @@ async def on_message_delete(message: discord.Message):
 
     await message.channel.send(
         f"⚠️ {who} deleted a counting message!! Next count is **{next_count}**"
-    )
+    )'''
 
