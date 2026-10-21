@@ -55,6 +55,7 @@ BELLA_FACTS = [
 ]
 
 @app_commands.guild_only()
+@app_commands.default_permissions(administrator=True)
 @bot.tree.command(name="bella", description="Learn all about Bellita! 💜")
 async def bella(interaction: discord.Interaction):
     try:
