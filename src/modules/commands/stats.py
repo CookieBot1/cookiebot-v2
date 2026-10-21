@@ -1,16 +1,17 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 
-from resources.helpers import get_guild_icon
 from resources.checks import lookup_counter, lookup_server, new_counter
-from typing import Optional
-from attrs import define, field
 
-@bot.command(aliases = ["serverstats", "guildstats"])
-async def stats(ctx):
+@bot.tree.command(name="stats", description="View this server's statistics and top players.")
+@app_commands.guild_only()
+async def stats(interaction: discord.Interaction):
     try:
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
+        await interaction.response.defer()
+
+        guildID = interaction.guild.id
+        guild = interaction.guild
 
         counterData = await lookup_counter(guildID)
         if counterData is False:
@@ -21,10 +22,10 @@ async def stats(ctx):
         highScore = counterData["settings"]["counter"]["highScore"]
 
         ## this block fetches their data from the database
-        userData = await lookup_server(guildID) 
+        userData = await lookup_server(guildID)
         if userData == False:
             raise Exception("Insufficient server data found, try again later.")
-        
+
         ## figure out who's #1 in each category
         guild_users: dict = userData.get("users", {})
 
@@ -84,9 +85,13 @@ async def stats(ctx):
             rich_rob_name = user.global_name or user.name
         stats_embed.add_field(name = "💰 Richest Thief", value = f"**{rich_rob_name}** stole **{rich_rob_val}** cookie{'s' if rich_rob_val != 1 else ''}", inline = False)
 
-        stats_embed.set_thumbnail(url=get_guild_icon(ctx))
+        if guild.icon:
+            stats_embed.set_thumbnail(url=guild.icon.url)
 
-        await ctx.send(embed=stats_embed)
+        await interaction.followup.send(embed=stats_embed)
 
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)

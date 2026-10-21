@@ -8,6 +8,7 @@ from resources.mrcookie import instance as bot
 
 
 @bot.tree.command(name="resetdaily", description="Restore daily streak eligibility across all servers.")
+@app_commands.default_permissions(administrator=True)
 async def resetdaily(interaction: discord.Interaction):
     if interaction.user.id not in ADMIN_USERS:
         return await interaction.response.send_message(

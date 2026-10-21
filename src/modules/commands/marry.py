@@ -1,6 +1,6 @@
 from resources.mrcookie import instance as bot
 import discord
-from discord.ext import commands
+from discord import app_commands
 from datetime import datetime, timezone
 
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted
@@ -37,31 +37,35 @@ class MarriageView(discord.ui.View):
         self.stop()
 
 
-@bot.command(aliases=['propose'])
-@commands.cooldown(1, 15, commands.BucketType.user)
-async def marry(ctx, user: discord.Member):
+@bot.tree.command(name="marry", description="Propose marriage to another user.")
+@app_commands.guild_only()
+@app_commands.describe(user="The user you want to marry.")
+@app_commands.checks.cooldown(1, 15, key=lambda interaction: interaction.user.id)
+async def marry(interaction: discord.Interaction, user: discord.Member):
     try:
-        guildID = ctx.guild.id
+        await interaction.response.defer()
+
+        guildID = interaction.guild.id
         userID = str(user.id)
-        senderID = str(ctx.author.id)
+        senderID = str(interaction.user.id)
 
         ## Bella is only allowed to marry John 💜
-        if senderID == BELLA_ID and userID != JOHN_ID:
-            await ctx.send(
+        if senderID == str(BELLA_ID) and userID != str(JOHN_ID):
+            await interaction.followup.send(
                 "You must've been hacked bellita, because you're already married to Johnny. 💜\n"
                 "Request denied. You already have your man."
             )
             return
-        if userID == BELLA_ID and senderID != JOHN_ID:
-            await ctx.send(
+        if userID == str(BELLA_ID) and senderID != str(JOHN_ID):
+            await interaction.followup.send(
                 "Absolutely not. Bella is already reserved for Johnny. 💜"
             )
             return
 
-        sender = ctx.author
+        sender = interaction.user
 
         ## validation
-        if user.id == ctx.author.id:
+        if user.id == interaction.user.id:
             raise Exception("Invalid user, you can't marry yourself!")
 
         if await is_blacklisted(userID):
@@ -103,7 +107,7 @@ async def marry(ctx, user: discord.Member):
             color=0xf1c40f
         )
 
-        proposal_message = await ctx.send(embed=proposal_embed, view=view)
+        proposal_message = await interaction.followup.send(embed=proposal_embed, view=view, wait=True)
 
         await view.wait()
 
@@ -113,10 +117,10 @@ async def marry(ctx, user: discord.Member):
             pass
 
         if view.accepted is None:
-            return await ctx.send("⏰ Marriage proposal timed out!")
+            return await interaction.followup.send("⏰ Marriage proposal timed out!")
 
         if view.accepted == False:
-            return await ctx.send("💔 Marriage proposal declined.")
+            return await interaction.followup.send("💔 Marriage proposal declined.")
 
         ## marry them
         userMarried = senderID
@@ -128,7 +132,7 @@ async def marry(ctx, user: discord.Member):
             description=f"{sender.mention} and {user.mention} are now **MARRIED**!",
             color=0x00ff00
         )
-        await ctx.send(embed=marry_embed)
+        await interaction.followup.send(embed=marry_embed)
 
         ## update db
         await update_value(userID, guildID, "Married", userMarried)
@@ -146,12 +150,21 @@ async def marry(ctx, user: discord.Member):
         await update_value(senderID, guildID, "CoupleCookiesEarned", 0)
 
     except Exception as Error:
-        await ctx.send(str(Error))
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)
 
 
 @marry.error
-async def marry_error(ctx, error):
-    if isinstance(error, commands.CommandOnCooldown):
-        await ctx.send(f"Slow down! Try again in **{round(error.retry_after)} seconds**.")
+async def marry_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    if isinstance(error, app_commands.CommandOnCooldown):
+        await interaction.response.send_message(
+            f"Slow down! Try again in **{round(error.retry_after)} seconds**.",
+            ephemeral=True
+        )
     else:
-        await ctx.send(f"An error occurred: {str(error)}")
+        await interaction.response.send_message(
+            f"An error occurred: {str(error)}",
+            ephemeral=True
+        )

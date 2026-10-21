@@ -1,4 +1,3 @@
-
 from resources.mrcookie import instance as bot
 import discord
 from discord import app_commands

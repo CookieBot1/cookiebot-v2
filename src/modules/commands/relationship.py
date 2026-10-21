@@ -1,7 +1,8 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 from datetime import datetime, timezone
-from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
+from resources.checks import lookup_database, new_database, is_blacklisted
 
 
 BELLA_ID = 846544080111665182
@@ -53,33 +54,29 @@ def format_duration(start_date):
     return ", ".join(parts)
 
 
-@bot.command(aliases=["relationshipstats", "couple"])
-async def relationship(ctx, userID="0"):
+@bot.tree.command(name="relationship", description="View your or another user's relationship statistics.")
+@app_commands.guild_only()
+@app_commands.describe(user="The user whose relationship you want to view.")
+async def relationship(interaction: discord.Interaction, user: discord.Member = None):
     try:
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
+        await interaction.response.defer()
+
+        guildID = interaction.guild.id
+        guild = interaction.guild
 
         ## determine whose relationship to show
-        if userID != "0":
-            userID = await validate_user(userID)
-
-            if userID is None:
-                raise Exception("Invalid user, try again!")
-
-            try:
-                await guild.fetch_member(int(userID))
-            except discord.NotFound:
-                raise Exception("Invalid user, try again!")
+        if user is not None:
+            userID = str(user.id)
 
             if await is_blacklisted(userID):
                 raise Exception("Can't show relationship, user is blacklisted.")
         else:
-            userID = ctx.author.id
+            userID = interaction.user.id
 
         userID = str(userID)
 
-        if int(userID) == ctx.author.id:
-            member = ctx.author
+        if int(userID) == interaction.user.id:
+            member = interaction.user
         else:
             member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
 
@@ -105,7 +102,7 @@ async def relationship(ctx, userID="0"):
 
             embed.set_thumbnail(url=member.display_avatar.url)
 
-            await ctx.send(embed=embed)
+            await interaction.followup.send(embed=embed)
             return
 
         partnerID = str(userMarried)
@@ -240,7 +237,10 @@ async def relationship(ctx, userID="0"):
         relationship_embed.set_thumbnail(url=member.display_avatar.url)
         relationship_embed.set_footer(text=footer)
 
-        await ctx.send(embed=relationship_embed)
+        await interaction.followup.send(embed=relationship_embed)
 
     except Exception as Error:
-        await ctx.send(str(Error))
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)

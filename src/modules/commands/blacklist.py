@@ -5,6 +5,7 @@ from resources.mrcookie import instance as bot
 from resources.checks import is_admin, validate_user, is_blacklisted
 
 @bot.tree.command(name="blacklist", description="Blacklist a user from CookieBot.")
+@app_commands.default_permissions(administrator=True)
 @app_commands.describe(temp_id="The Discord ID of the user to blacklist.")
 async def blacklist(interaction: discord.Interaction, temp_id: str):
     try:

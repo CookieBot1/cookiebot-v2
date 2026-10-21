@@ -5,6 +5,7 @@ from resources.mrcookie import instance as bot
 from resources.checks import lookup_database, new_database, update_value, is_blacklisted, validate_user, is_admin
 
 @bot.tree.command(name="generate", description="Generate or remove cookies from a user's balance.")
+@app_commands.default_permissions(administrator=True)
 @app_commands.guild_only()
 @app_commands.describe(user_id="The Discord ID of the user.", amount="The amount of cookies to generate or remove.")
 @app_commands.checks.cooldown(1, 5.0)

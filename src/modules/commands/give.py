@@ -21,9 +21,6 @@ async def give(interaction: discord.Interaction, user: discord.Member, amount: i
         if user.id == interaction.user.id:
             raise Exception("Invalid user, you can't give cookies to yourself!")
 
-        if user is None:
-            raise Exception("Invalid user, try again!")
-
         if await is_blacklisted(userID):
             raise Exception("Illegal activity! You can't give to a blacklisted user!")
 
@@ -52,6 +49,10 @@ async def give(interaction: discord.Interaction, user: discord.Member, amount: i
         userCookies += amount
         senderCookies -= amount
 
+        ## update the database
+        await update_value(userID, guildID, "Cookies", userCookies)
+        await update_value(senderID, guildID, "Cookies", senderCookies)
+
         ## send the embed
         give_embed = discord.Embed(
             title="💨 " + str(amount) + " Cookies Transferring..",
@@ -68,10 +69,6 @@ async def give(interaction: discord.Interaction, user: discord.Member, amount: i
         give_embed.set_footer(text="Cookies delivered by Sam")
 
         await interaction.followup.send(embed=give_embed)
-
-        ## update the database
-        await update_value(userID, guildID, "Cookies", userCookies)
-        await update_value(senderID, guildID, "Cookies", senderCookies)
 
     except Exception as Error:
         if interaction.response.is_done():

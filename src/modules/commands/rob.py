@@ -2,6 +2,7 @@ import random
 from datetime import datetime, timedelta
 
 import discord
+from discord import app_commands
 
 from modules.commands.robbing.messages import success_list, fail_list, gifted_fail_list
 from resources.checks import (
@@ -10,7 +11,6 @@ from resources.checks import (
     new_database,
     update_many_values,
     update_value,
-    validate_user,
 )
 from resources.constants import EMBED_GREEN, EMBED_RED
 from resources.mrcookie import instance as bot
@@ -19,13 +19,17 @@ BELLA_ID = 846544080111665182
 BELLA_REVENGE_BONUS = 50
 
 
-@bot.command(aliases=["steal", "mug"])
-async def rob(ctx, userID="0"):
+@bot.tree.command(name="rob", description="Attempt to rob cookies from another user.")
+@app_commands.guild_only()
+@app_commands.describe(user="The user to rob (leave empty for a random target).")
+async def rob(interaction: discord.Interaction, user: discord.Member = None):
     try:
-        guild_id = ctx.guild.id
-        guild = ctx.bot.get_guild(guild_id)
-        sender_id = ctx.author.id
-        sender = ctx.author
+        await interaction.response.defer()
+
+        guild_id = interaction.guild.id
+        guild = interaction.guild
+        sender_id = interaction.user.id
+        sender = interaction.user
 
         ## this block fetches user data from the database
         guild_data = await lookup_database(sender_id, guild_id)
@@ -43,33 +47,20 @@ async def rob(ctx, userID="0"):
         if sender_rob_cooldown > datetime.now():
             raise ValueError()
 
-        ## custom bella code
-        if ctx.author.id == 846544080111665182:
-            await ctx.send("Omg bellita.. are you trying to rob someone.. 🥺")
-            await ctx.send("But MAMAAA I'm in love with a CRIMINALLLL-")
-            await ctx.send("And this type of love isn't rational.. it's ❤️ PHYSICALLL ❤️")
-            await ctx.send("https://tenor.com/view/meme-milk-gif-6919750708092698197")
-
-
         ## validate the pinged user, if any. if empty user parameter, get random user from database
-        if userID != "0":
-            userID = await validate_user(userID)
-        if userID is None or int(userID) == ctx.author.id:
-            raise Exception("Invalid user, try again!")
-
-        try:
-            await guild.fetch_member(int(userID))
-        except discord.NotFound:
-            raise Exception("Invalid user, try again!")
-            if await is_blacklisted(int(userID)):
+        if user is not None:
+            userID = str(user.id)
+            if int(userID) == sender_id:
+                raise Exception("Invalid user, try again!")
+            if await is_blacklisted(userID):
                 raise Exception("Unable to rob, that user is blacklisted.")
-            
+
             ## checks for the user being robbed
             user_data = await lookup_database(userID, guild_id)
             if user_data == False:
                 await new_database(userID, guild_id)
                 user_data = await lookup_database(userID, guild_id)
-            
+
         ## find a random user from database
         else:
             database_users = dict(guild_data["users"])
@@ -78,19 +69,22 @@ async def rob(ctx, userID="0"):
 
             if not database_users:
                 raise Exception("There are no other users to rob! 😶")
-            
-            ## assign a random user to be robbed if no user parameter is given
-            counter = 0
-            user_found = False
-            while counter < len(database_users): 
-                userID = database_users[random.randrange(0, len(database_users))]
-                user_data = await lookup_database(userID, guild_id)
 
-                if user_data["users"][userID]["Cookies"] >= 15:
+            ## assign a random user to be robbed if no user parameter is given
+            random.shuffle(database_users)
+            user_found = False
+            for userID in database_users:
+                if await is_blacklisted(userID):
+                    continue
+                try:
+                    member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
+                except (discord.NotFound, discord.Forbidden):
+                    continue
+                user_data = await lookup_database(userID, guild_id)
+                if user_data and user_data["users"].get(userID, {}).get("Cookies", 0) >= 15:
                     user_found = True
                     break
-                counter += 1
-            
+
             if user_found == False:
                 raise Exception("No other user has enough cookies! 😶")
         userID = int(userID)
@@ -99,12 +93,12 @@ async def rob(ctx, userID="0"):
 
         ## custom bella code
         if sender_id == BELLA_ID:
-            await ctx.send(
+            await interaction.followup.send(
                 "Omg bellita.. are you trying to rob someone.. 🥺\n"
                 "But MAMAAA I'm in love with a CRIMINALLLL-\n"
                 "And this type of love isn't rational.. it's ❤️ PHYSICALLL ❤️"
             )
-            await ctx.send(
+            await interaction.followup.send(
                 "https://tenor.com/view/meme-milk-gif-6919750708092698197"
             )
 
@@ -243,7 +237,7 @@ async def rob(ctx, userID="0"):
         embed.set_author(name=embed_title, icon_url=sender.display_avatar)
         embed.timestamp = cooldown
         embed.set_footer(text=f"Your crew will be ready again by")
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 
     ## rob cooldown active message
@@ -258,6 +252,6 @@ async def rob(ctx, userID="0"):
         timeout_embed.set_author(
             name="Easy there " + str(sender.display_name) + "!", icon_url=sender.display_avatar
         )
-        await ctx.send(embed=timeout_embed)
+        await interaction.followup.send(embed=timeout_embed)
     except Exception as error:
-        await ctx.send(error)
+        await interaction.followup.send(str(error), ephemeral=True)

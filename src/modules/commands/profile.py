@@ -1,9 +1,10 @@
 from resources.mrcookie import instance as bot
 import discord
+from discord import app_commands
 from typing import Optional
 from attrs import define, field
 
-from resources.checks import lookup_database, new_database, validate_user, is_blacklisted
+from resources.checks import lookup_database, new_database, is_blacklisted
 
 BELLA_ID = 846544080111665182
 
@@ -23,30 +24,28 @@ class SimpleUser:
         f"\n{self.cookies} Cookie{'s' if self.cookies != 1 else ''}"
         )
 
-@bot.command(aliases = ["whoami", "mystats"])
-async def profile(ctx, userID = '0'):
+@bot.tree.command(name="profile", description="View your or another user's profile.")
+@app_commands.guild_only()
+@app_commands.describe(user="The user whose profile you want to view.")
+async def profile(interaction: discord.Interaction, user: Optional[discord.Member] = None):
     try:
+        await interaction.response.defer()
+
         ## set vars
-        guildID = ctx.guild.id
-        guild = ctx.bot.get_guild(guildID)
+        guildID = interaction.guild.id
+        guild = interaction.guild
 
         ## if another user was mentioned, check if they're legit, else use sender ID
-        if userID != '0':
-            userID = await validate_user(userID)
-            if userID is None:
-                raise Exception("Invalid user, try again!")
-
-            try:
-                member = await guild.fetch_member(int(userID))
-            except discord.NotFound:
-                raise Exception("Invalid user, try again!")
+        if user is not None:
+            userID = str(user.id)
+            member = user
             if await is_blacklisted(userID): raise Exception("Can't show stats, user is blacklisted.")
         else:
-            userID = ctx.author.id
+            userID = interaction.user.id
         
         ## set vars
-        if int(userID) == ctx.author.id:
-            member = ctx.author
+        if int(userID) == interaction.user.id:
+            member = interaction.user
         else:
             member = guild.get_member(int(userID)) or await guild.fetch_member(int(userID))
         
@@ -84,13 +83,13 @@ async def profile(ctx, userID = '0'):
         userRobCount = 0 if rob_count is None else int(rob_count)
         userRobGains = 0 if rob_gains is None else int(rob_gains)
         userProfileColor = 0x7289da if userProfileColor is None else int(userProfileColor)
-        userProfileBio = "No bio set. Run ``.customize profile`` to set one!" if userProfileBio is None else str(userProfileBio)
+        userProfileBio = "No bio set. Run ``/customize profile`` to set one!" if userProfileBio is None else str(userProfileBio)
         ## ------------------------------------------------------------
 
         def clamp(text: str, n: int = 140) -> str:
             text = (text or "").strip()
             if not text:
-                return "No bio set yet. Use `.customize profile` ✏️"
+                return "No bio set yet. Use `/customize profile` ✏️"
             return text[:n] + ("…" if len(text) > n else "")
 
         def fmt_int(x) -> str:
@@ -251,7 +250,10 @@ async def profile(ctx, userID = '0'):
 
         stats_embed.set_thumbnail(url=member.display_avatar.url)
         
-        await ctx.send(embed=stats_embed)
+        await interaction.followup.send(embed=stats_embed)
     
     except Exception as Error:
-        await ctx.send(Error)
+        if interaction.response.is_done():
+            await interaction.followup.send(str(Error), ephemeral=True)
+        else:
+            await interaction.response.send_message(str(Error), ephemeral=True)
